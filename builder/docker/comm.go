@@ -1,29 +1,26 @@
-package null
+package docker
 
 import (
 	"fmt"
+	"io/ioutil"
+
 	"github.com/mitchellh/multistep"
 	"github.com/mitchellh/packer/communicator/ssh"
+	"github.com/mitchellh/packer/helper/communicator"
 	gossh "golang.org/x/crypto/ssh"
-	"io/ioutil"
 )
 
-func CommHost(host string) func(multistep.StateBag) (string, error) {
-	return func(state multistep.StateBag) (string, error) {
-		return host, nil
-	}
+func commHost(state multistep.StateBag) (string, error) {
+	containerId := state.Get("container_id").(string)
+	driver := state.Get("driver").(Driver)
+	return driver.IPAddress(containerId)
 }
 
-// SSHConfig returns a function that can be used for the SSH communicator
-// config for connecting to the specified host via SSH
-// private_key_file has precedence over password!
-func SSHConfig(username string, password string, privateKeyFile string) func(multistep.StateBag) (*gossh.ClientConfig, error) {
+func sshConfig(comm *communicator.Config) func(state multistep.StateBag) (*gossh.ClientConfig, error) {
 	return func(state multistep.StateBag) (*gossh.ClientConfig, error) {
-
-		if privateKeyFile != "" {
+		if comm.SSHPrivateKey != "" {
 			// key based auth
-
-			bytes, err := ioutil.ReadFile(privateKeyFile)
+			bytes, err := ioutil.ReadFile(comm.SSHPrivateKey)
 			if err != nil {
 				return nil, fmt.Errorf("Error setting up SSH config: %s", err)
 			}
@@ -35,20 +32,19 @@ func SSHConfig(username string, password string, privateKeyFile string) func(mul
 			}
 
 			return &gossh.ClientConfig{
-				User: username,
+				User: comm.SSHUsername,
 				Auth: []gossh.AuthMethod{
 					gossh.PublicKeys(signer),
 				},
 			}, nil
 		} else {
 			// password based auth
-
 			return &gossh.ClientConfig{
-				User: username,
+				User: comm.SSHUsername,
 				Auth: []gossh.AuthMethod{
-					gossh.Password(password),
+					gossh.Password(comm.SSHPassword),
 					gossh.KeyboardInteractive(
-						ssh.PasswordKeyboardInteractive(password)),
+						ssh.PasswordKeyboardInteractive(comm.SSHPassword)),
 				},
 			}, nil
 		}
