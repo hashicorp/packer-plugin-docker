@@ -1,11 +1,14 @@
 ---
-description: |
-    The docker Packer builder builds Docker images using Docker. The builder starts
-    a Docker container, runs provisioners within this container, then exports the
-    container for reuse or commits the image.
+description: >
+  The docker Packer builder builds Docker images using Docker. The builder
+  starts
+
+  a Docker container, runs provisioners within this container, then exports the
+
+  container for reuse or commits the image.
 layout: docs
-page_title: 'Docker - Builders'
-sidebar_current: 'docs-builders-docker'
+page_title: Docker - Builders
+sidebar_current: docs-builders-docker
 ---
 
 # Docker Builder
@@ -16,7 +19,7 @@ The `docker` Packer builder builds [Docker](https://www.docker.io) images using
 Docker. The builder starts a Docker container, runs provisioners within this
 container, then exports the container for reuse or commits the image.
 
-Packer builds Docker containers *without* the use of
+Packer builds Docker containers _without_ the use of
 [Dockerfiles](https://docs.docker.com/engine/reference/builder/). By not using
 `Dockerfiles`, Packer is able to provision containers with portable scripts or
 configuration management systems that are not tied to Docker in any way. It
@@ -25,8 +28,8 @@ provision a normal virtualized or dedicated server. For more information, read
 the section on [Dockerfiles](#dockerfiles).
 
 The Docker builder must run on a machine that has Docker Engine installed.
-Therefore the builder only works on machines that support Docker and *does not
-support running on a Docker remote host*. You can learn about what [platforms
+Therefore the builder only works on machines that support Docker and _does not
+support running on a Docker remote host_. You can learn about what [platforms
 Docker supports and how to install onto
 them](https://docs.docker.com/engine/installation/) in the Docker
 documentation.
@@ -92,39 +95,39 @@ from ubuntu as an simple example:
 
 Allowed metadata fields that can be changed are:
 
--   CMD
-    -   String, supports both array (escaped) and string form
-    -   EX: `"CMD [\"nginx\", \"-g\", \"daemon off;\"]"` corresponds to Docker exec form
-    -   EX: `"CMD nginx -g daemon off;"` corresponds to Docker shell form, invokes a command shell first
--   ENTRYPOINT
-    -   String, supports both array (escaped) and string form
-    -   EX: `"ENTRYPOINT [\"/bin/sh\", \"-c\", \"/var/www/start.sh\"]"` corresponds to Docker exec form
-    -   EX: `"ENTRYPOINT /var/www/start.sh"` corresponds to Docker shell form, invokes a command shell first
--   ENV
-    -   String, note there is no equal sign:
-    -   EX: `"ENV HOSTNAME www.example.com"` not
-        `"ENV HOSTNAME=www.example.com"`
--   EXPOSE
-    -   String, space separated ports
-    -   EX: `"EXPOSE 80 443"`
--   LABEL
-    -   String, space separated key=value pairs
-    -   EX: `"LABEL version=1.0"`
--   ONBUILD
-    -   String
-    -   EX: `"ONBUILD RUN date"`
--   MAINTAINER
-    -   String, deprecated in Docker version 1.13.0
-    -   EX: `"MAINTAINER NAME"`
--   USER
-    -   String
-    -   EX: `"USER USERNAME"`
--   VOLUME
-    -   String
-    -   EX: `"VOLUME FROM TO"`
--   WORKDIR
-    -   String
-    -   EX: `"WORKDIR PATH"`
+- CMD
+  - String, supports both array (escaped) and string form
+  - EX: `"CMD [\"nginx\", \"-g\", \"daemon off;\"]"` corresponds to Docker exec form
+  - EX: `"CMD nginx -g daemon off;"` corresponds to Docker shell form, invokes a command shell first
+- ENTRYPOINT
+  - String, supports both array (escaped) and string form
+  - EX: `"ENTRYPOINT [\"/bin/sh\", \"-c\", \"/var/www/start.sh\"]"` corresponds to Docker exec form
+  - EX: `"ENTRYPOINT /var/www/start.sh"` corresponds to Docker shell form, invokes a command shell first
+- ENV
+  - String, note there is no equal sign:
+  - EX: `"ENV HOSTNAME www.example.com"` not
+    `"ENV HOSTNAME=www.example.com"`
+- EXPOSE
+  - String, space separated ports
+  - EX: `"EXPOSE 80 443"`
+- LABEL
+  - String, space separated key=value pairs
+  - EX: `"LABEL version=1.0"`
+- ONBUILD
+  - String
+  - EX: `"ONBUILD RUN date"`
+- MAINTAINER
+  - String, deprecated in Docker version 1.13.0
+  - EX: `"MAINTAINER NAME"`
+- USER
+  - String
+  - EX: `"USER USERNAME"`
+- VOLUME
+  - String
+  - EX: `"VOLUME FROM TO"`
+- WORKDIR
+  - String
+  - EX: `"WORKDIR PATH"`
 
 ## Configuration Reference
 
@@ -132,20 +135,19 @@ Configuration options are organized below into two categories: required and
 optional. Within each category, the available options are alphabetized and
 described.
 
-The Docker builder uses a special Docker communicator *and will not use* the
+The Docker builder uses a special Docker communicator _and will not use_ the
 standard [communicators](/docs/templates/communicator.html).
 
 ### Required:
 
 You must specify (only) one of `commit`, `discard`, or `export_path`.
 
-
-<%= partial "partials/builder/docker/Config-required" %>
+@include 'partials/builder/docker/Config-required.mdx'
 
 ### Optional:
 
-<%= partial "partials/builder/docker/AwsAccessConfig-not-required" %>
-<%= partial "partials/builder/docker/Config-not-required" %>
+@include 'partials/builder/docker/AwsAccessConfig-not-required.mdx'
+@include 'partials/builder/docker/Config-not-required.mdx'
 
 ## Using the Artifact: Export
 
@@ -155,7 +157,7 @@ with the [docker-import](/docs/post-processors/docker-import.html) and
 [docker-push](/docs/post-processors/docker-push.html) post-processors.
 
 **Note:** This section is covering how to use an artifact that has been
-*exported*. More specifically, if you set `export_path` in your configuration.
+_exported_. More specifically, if you set `export_path` in your configuration.
 If you set `commit`, see the next section.
 
 The example below shows a full configuration that would import and push the
@@ -187,7 +189,7 @@ handles pushing the image to a container repository.
 If you want to do this manually, however, perhaps from a script, you can import
 the image using the process below:
 
-``` shell
+```shell
 $ docker import - registry.mydomain.com/mycontainer:latest < artifact.tar
 ```
 
@@ -261,7 +263,7 @@ containers. Windows containers use a different communicator than linux
 containers, because Windows containers cannot use `docker cp`.
 
 If you are building a Windows container, you must set the template option
-`"windows_container": true`.  Please note that docker cannot export Windows
+`"windows_container": true`. Please note that docker cannot export Windows
 containers, so you must either commit or discard them.
 
 The following is a fully functional template for building a Windows
@@ -269,7 +271,7 @@ container.
 
 ```json
 {
-    "builders": [
+  "builders": [
     {
       "type": "docker",
       "image": "microsoft/windowsservercore:1709",
@@ -313,7 +315,7 @@ credentials.](/docs/builders/amazon.html#specifying-amazon-credentials)
 
 ## Dockerfiles
 
-This builder allows you to build Docker images *without* Dockerfiles.
+This builder allows you to build Docker images _without_ Dockerfiles.
 
 With this builder, you can repeatedly create Docker images without the use of a
 Dockerfile. You don't need to know the syntax or semantics of Dockerfiles.
