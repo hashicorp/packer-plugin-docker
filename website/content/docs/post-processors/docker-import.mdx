@@ -27,21 +27,23 @@ registry.
 
 ```json
 {
-  "builders": [{
-    "type": "docker",
-    "image": "ubuntu:18.04",
-    "export_path": "party_parrot.tar"
-  }],
+  "builders": [
+    {
+      "type": "docker",
+      "image": "ubuntu:18.04",
+      "export_path": "party_parrot.tar"
+    }
+  ],
   "post-processors": [
     {
-    "type": "docker-import",
-    "repository": "local/ubuntu",
-    "tag": "latest"
-  }
-]
+      "type": "docker-import",
+      "repository": "local/ubuntu",
+      "tag": "latest"
+    }
+  ]
 }
-
 ```
+
 </Tab>
 <Tab heading="HCL2">
 
