@@ -5,9 +5,9 @@ import (
 	"context"
 	"testing"
 
+	"github.com/hashicorp/packer-plugin-docker/builder/docker"
+	dockerimport "github.com/hashicorp/packer-plugin-docker/post-processor/docker-import"
 	packersdk "github.com/hashicorp/packer-plugin-sdk/packer"
-	"github.com/hashicorp/packer/builder/docker"
-	dockerimport "github.com/hashicorp/packer/post-processor/docker-import"
 	"github.com/stretchr/testify/assert"
 )
 
