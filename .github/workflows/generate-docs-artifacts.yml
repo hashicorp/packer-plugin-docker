@@ -38,7 +38,7 @@ jobs:
           committer: "packer-ci <62970560+packer-ci@users.noreply.github.com"
           # Comment out the author field if you would like to change the author of the pull-request.
           # Defaults to the name of the user who triggered the event - created the tag.
-          author: "packer-ci"
+          # author: "Display Name <email@address.com>"
           # Comment out the labels field to automatically apply a common separated list of labels to the created pull-request.
           # labels
           delete-branch: true
