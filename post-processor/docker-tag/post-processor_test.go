@@ -190,7 +190,7 @@ func TestPostProcessor_PostProcess_Tag_vs_Tags(t *testing.T) {
 			t.Fatalf("err: %s", err)
 		}
 		assert.ElementsMatchf(t, p.config.Tags, []string{"bar", "buzz", "bang"},
-			"tag and tags fields should be combined into tags fields. Recieved: %#v",
+			"tag and tags fields should be combined into tags fields. Received: %#v",
 			p.config.Tags)
 	}
 }
