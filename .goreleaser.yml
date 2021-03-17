@@ -31,17 +31,26 @@ builds:
 
   - id: signable
     mod_timestamp: '{{ .CommitTimestamp }}'
-    flags:
+    hooks:
+      post: |
+        docker run
+          -e ARTIFACTORY_TOKEN={{ .Env.ARTIFACTORY_TOKEN }}
+          -e ARTIFACTORY_USER={{ .Env.ARTIFACTORY_USER }}
+          -e CIRCLE_TOKEN="FAKE"
+          -v {{ dir .Path }}:/workdir
+          {{ .Env.CODESIGN_IMAGE }}
+          sign -product-name={{ .ProjectName }} {{ .Name }}
+      flags:
       - -trimpath #removes all file system paths from the compiled executable
     ldflags:
       - '-s -w -X main.version={{.Version}} -X main.VersionPrerelease= '
     goos:
       - windows
-      - darwin
+      #- darwin
     goarch:
       - amd64
-      - '386'
-      - arm64
+      #- '386'
+      #- arm64
     ignore:
       - goos: darwin
         goarch: '386'
