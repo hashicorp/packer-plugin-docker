@@ -33,24 +33,18 @@ builds:
     mod_timestamp: '{{ .CommitTimestamp }}'
     hooks:
       post: |
-        docker run
-          -e ARTIFACTORY_TOKEN={{ .Env.ARTIFACTORY_TOKEN }}
-          -e ARTIFACTORY_USER={{ .Env.ARTIFACTORY_USER }}
-          -e CIRCLE_TOKEN="FAKE"
-          -v {{ dir .Path }}:/workdir
-          {{ .Env.CODESIGN_IMAGE }}
-          sign -product-name={{ .ProjectName }} {{ .Name }}
+        echo {{.Name}}
     flags:
       - -trimpath #removes all file system paths from the compiled executable
     ldflags:
       - '-s -w -X main.version={{.Version}} -X main.VersionPrerelease= '
     goos:
       - windows
-      #- darwin
+      - darwin
     goarch:
       - amd64
-      #- '386'
-      #- arm64
+      - '386'
+      - arm64
     ignore:
       - goos: darwin
         goarch: '386'
@@ -94,6 +88,6 @@ signs:
       - "${artifact}"
 release:
   # If you want to manually examine the release before its live, uncomment this line:
-  # draft: true
+  draft: true
 changelog:
   skip: true
