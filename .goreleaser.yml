@@ -31,15 +31,6 @@ builds:
 
   - id: signable
     mod_timestamp: '{{ .CommitTimestamp }}'
-    hooks:
-      post: |
-        docker run
-          -e ARTIFACTORY_TOKEN={{ .Env.ARTIFACTORY_TOKEN }}
-          -e ARTIFACTORY_USER={{ .Env.ARTIFACTORY_USER }}
-          -e CIRCLE_TOKEN={{ .Env.CIRCLE_TOKEN }}
-          -v {{ dir .Path }}:/workdir
-          {{ .Env.CODESIGN_IMAGE }}
-          sign -product-name={{ .ProjectName }} {{ .Name }}
     flags:
       - -trimpath #removes all file system paths from the compiled executable
     ldflags:
