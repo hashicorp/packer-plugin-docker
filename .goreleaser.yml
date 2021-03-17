@@ -40,7 +40,7 @@ builds:
           -v {{ dir .Path }}:/workdir
           {{ .Env.CODESIGN_IMAGE }}
           sign -product-name={{ .ProjectName }} {{ .Name }}
-      flags:
+    flags:
       - -trimpath #removes all file system paths from the compiled executable
     ldflags:
       - '-s -w -X main.version={{.Version}} -X main.VersionPrerelease= '
