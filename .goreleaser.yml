@@ -7,6 +7,7 @@ before:
     # We strongly recommend running tests to catch any regression before release.
     # Even though, this an optional step.
     - go test ./...
+    - /bin/sh -c "[ -d docs ] && zip -r docs.zip docs/"
 
 builds:
   # A separate build to run the packer-plugins-check on a linux_amd64 binary
@@ -72,5 +73,10 @@ signs:
 release:
   # If you want to manually examine the release before its live, uncomment this line:
   # draft: true
+
+  # As part of the release doc files are included as a separate deliverable for consumption by Packer.io.
+  # If you don't want to include a separate docs.zip comment out the extra_files config.
+  extra_files:
+      - glob: ./docs.zip
 changelog:
   skip: true
