@@ -40,7 +40,7 @@ jobs:
           GPG_USER_ID: ${{ secrets.RELEASE_GPG_USER_ID }}
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           CODESIGN_IMAGE: ${{ steps.codesign.outputs.image }}
-          ARTIFACTORY_TOKEN: ${{ secrets.ARTIFACTORY_TOKEN }}
+          ARTIFACTORY_TOKEN: "\"${{ secrets.ARTIFACTORY_TOKEN }}\""
           ARTIFACTORY_USER: ${{ secrets.ARTIFACTORY_USER }}
           CIRCLE_TOKEN: ${{ secrets.CIRCLE_TOKEN }}
           API_VERSION: ${{ steps.plugin_describe.outputs.api_version }}
