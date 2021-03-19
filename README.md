@@ -1,10 +1,10 @@
 # Docker Packer Plugin
 
-The `docker` multi-component plugin can be used with HashiCorp [Packer][packer]
+The `docker` multi-component plugin can be used with HashiCorp [Packer](https://www.packer.io)
 to create custom [Docker](https://docker.io) images, that can then be tagged,
 imported, exported, and pushed to a Docker registry.
 
-For the full list of available features for this plugin see [/docs/README.md]
+For the full list of available features for this plugin see [docs](docs)
 
 
 ## Installation
@@ -15,16 +15,16 @@ For the full list of available features for this plugin see [/docs/README.md]
 
 Starting from version 1.7, Packer supports a new `packer init` command allowing
 automatic installation of Packer plugins. Read the
-[Packer documentation][packer-doc-init] for more information
+[Packer documentation](https://www.packer.io/docs/commands/init) for more information
 
 
 #### Manual installation
 
-You can find pre-built binary releases of the plugin [here][releases].
+You can find pre-built binary releases of the plugin [here](https://github.com/hashicorp/packer-plugin-docker/releases).
 Once you have downloaded the latest archive corresponding to your target OS,
 uncompress it to retrieve the plugin binary file corresponding to your platform.
 To install the plugin, please follow the Packer documentation on
-[installing a plugin][packer-doc-plugins].
+[installing a plugin](https://www.packer.io/docs/extending/plugins/#installing-plugins).
 
 
 ### From Sources
@@ -34,7 +34,7 @@ locally and run the command `go build` from the root of the sources
 directory. Upon successful compilation, a `packer-plugin-docker` plugin
 binary file can be found in the root of the sources directory.
 To install the compiled plugin, please follow the official Packer documentation
-on [installing a plugin][packer-doc-plugins].
+on [installing a plugin](https://www.packer.io/docs/extending/plugins/#installing-plugins).
 
 
 ### Configuration
@@ -53,9 +53,3 @@ documentation located in the [`docs/`](docs) directory.
   In case of feature contribution, we kindly ask you to open an issue to
   discuss it beforehand.
 
-
-[packer-doc-plugins]: https://www.packer.io/docs/extending/plugins/#installing-plugins
-[packer-doc-init]: https://www.packer.io/docs/commands/init
-[packer-doc-plugins]: https://www.packer.io/docs/extending/plugins/#installing-plugins
-[packer]: https://www.packer.io/
-[releases]: https://github.com/hashicorp/packer-plugin-docker/releases
