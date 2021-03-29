@@ -1,11 +1,6 @@
-# Docker Packer Plugin
-
-The `docker` multi-component plugin can be used with HashiCorp [Packer](https://www.packer.io)
-to create custom [Docker](https://docker.io) images, that can then be tagged,
-imported, exported, and pushed to a Docker registry.
-
-For the full list of available features for this plugin see [docs](docs)
-
+# Packer Plugin Docker
+The `Docker` multi-component plugin can be used with HashiCorp [Packer](https://www.packer.io)
+to create custom images. For the full list of available features for this plugin see [docs](docs).
 
 ## Installation
 
@@ -15,7 +10,7 @@ For the full list of available features for this plugin see [docs](docs)
 
 Starting from version 1.7, Packer supports a new `packer init` command allowing
 automatic installation of Packer plugins. Read the
-[Packer documentation](https://www.packer.io/docs/commands/init) for more information
+[Packer documentation](https://www.packer.io/docs/commands/init) for more information.
 
 
 #### Manual installation
@@ -30,9 +25,9 @@ To install the plugin, please follow the Packer documentation on
 ### From Sources
 
 If you prefer to build the plugin from sources, clone the GitHub repository
-locally and run the command `go build` from the root of the sources
+locally and run the command `go build` from the root
 directory. Upon successful compilation, a `packer-plugin-docker` plugin
-binary file can be found in the root of the sources directory.
+binary file can be found in the root directory.
 To install the compiled plugin, please follow the official Packer documentation
 on [installing a plugin](https://www.packer.io/docs/extending/plugins/#installing-plugins).
 
@@ -52,4 +47,3 @@ documentation located in the [`docs/`](docs) directory.
   fix a bug, please do so by opening a Pull Request in this GitHub repository.
   In case of feature contribution, we kindly ask you to open an issue to
   discuss it beforehand.
-
