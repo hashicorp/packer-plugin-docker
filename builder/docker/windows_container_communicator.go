@@ -40,6 +40,7 @@ func (c *WindowsContainerCommunicator) Upload(dst string, src io.Reader, fi *os.
 		return err
 	}
 	if fi != nil {
+		//nolint:errcheck
 		tempfile.Chmod((*fi).Mode())
 	}
 	tempfile.Close()

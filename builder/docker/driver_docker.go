@@ -132,6 +132,7 @@ func (d *DockerDriver) Import(path string, changes []string, repo string) (strin
 
 	go func() {
 		defer stdin.Close()
+		//nolint
 		io.Copy(stdin, file)
 	}()
 
@@ -211,7 +212,10 @@ func (d *DockerDriver) Login(repo, user, pass string) error {
 				d.l.Unlock()
 				return err
 			}
-			io.WriteString(stdin, pass)
+			_, err = io.WriteString(stdin, pass)
+			if err != nil {
+				return err
+			}
 			stdin.Close()
 		} else {
 			cmd.Args = append(cmd.Args, "-p", pass)
