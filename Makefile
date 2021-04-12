@@ -1,5 +1,5 @@
 
-NAME=scaffolding
+NAME=docker
 BINARY=packer-plugin-${NAME}
 
 COUNT?=1
