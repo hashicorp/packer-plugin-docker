@@ -1,0 +1,42 @@
+{
+  "builders": [
+    {
+      "discard": true,
+      "image": "ubuntu",
+      "run_command": [
+        "-d",
+        "-i",
+        "-t",
+        "-u",
+        "42",
+        "{{.Image}}",
+        "/bin/sh"
+      ],
+      "type": "docker"
+    }
+  ],
+  "provisioners": [
+    {
+      "destination": "/tmp/strawberry-cake",
+      "source": "test-fixtures/onecakes/strawberry",
+      "type": "file"
+    },
+    {
+      "destination": "/tmp/",
+      "source": "test-fixtures/manycakes",
+      "type": "file"
+    },
+    {
+      "inline": "touch /tmp/testUploadOwner",
+      "type": "shell"
+    },
+    {
+      "inline": [
+        "[ $(stat -c %u /tmp/strawberry-cake) -eq 42 ] || (echo 'Invalid owner of /tmp/strawberry-cake' && exit 1)",
+        "[ $(stat -c %u /tmp/testUploadOwner) -eq 42 ] || (echo 'Invalid owner of /tmp/testUploadOwner' && exit 1)",
+        "find /tmp/manycakes | xargs -n1 -IFILE /bin/sh -c '[ $(stat -c %u FILE) -eq 42 ] || (echo \"Invalid owner of FILE\" && exit 1)'"
+      ],
+      "type": "shell"
+    }
+  ]
+}

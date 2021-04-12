@@ -1,0 +1,29 @@
+{
+  "builders": [
+    {
+      "discard": true,
+      "image": "ubuntu",
+      "run_command": [
+        "-d",
+        "-i",
+        "-t",
+        "{{.Image}}",
+        "/bin/sh"
+      ],
+      "type": "docker"
+    }
+  ],
+  "provisioners": [
+    {
+      "destination": "/strawberry-cake",
+      "source": "test-fixtures/onecakes/strawberry",
+      "type": "file"
+    },
+    {
+      "destination": "my-strawberry-cake",
+      "direction": "download",
+      "source": "/strawberry-cake",
+      "type": "file"
+    }
+  ]
+}
