@@ -18,15 +18,6 @@ func testConfig() map[string]interface{} {
 	}
 }
 
-func testPP(t *testing.T) *PostProcessor {
-	var p PostProcessor
-	if err := p.Configure(testConfig()); err != nil {
-		t.Fatalf("err: %s", err)
-	}
-
-	return &p
-}
-
 func testUi() *packersdk.BasicUi {
 	return &packersdk.BasicUi{
 		Reader: new(bytes.Buffer),

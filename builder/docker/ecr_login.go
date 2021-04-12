@@ -36,7 +36,6 @@ type AwsAccessConfig struct {
 	// communicate with AWS. Learn how to set
 	// this.
 	Profile string `mapstructure:"aws_profile" required:"false"`
-	cfg     *awsbase.Config
 }
 
 // Get a login token for Amazon AWS ECR. Returns username and password

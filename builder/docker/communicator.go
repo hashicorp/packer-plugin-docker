@@ -98,7 +98,10 @@ func (c *Communicator) uploadReader(dst string, src io.Reader) error {
 	if _, err := io.Copy(tempfile, src); err != nil {
 		return fmt.Errorf("Failed to copy upload file to tempfile: %s", err)
 	}
-	tempfile.Seek(0, 0)
+	if _, err := tempfile.Seek(0, 0); err != nil {
+		return fmt.Errorf("Error seeking tempfile info: %s", err)
+	}
+
 	fi, err := tempfile.Stat()
 	if err != nil {
 		return fmt.Errorf("Error getting tempfile info: %s", err)
@@ -134,7 +137,10 @@ func (c *Communicator) uploadFile(dst string, src io.Reader, fi *os.FileInfo) er
 		return err
 	}
 	header.Name = filepath.Base(dst)
-	archive.WriteHeader(header)
+	if err := archive.WriteHeader(header); err != nil {
+		return fmt.Errorf("Failed to write header: %s", err)
+	}
+
 	numBytes, err := io.Copy(archive, src)
 	if err != nil {
 		return fmt.Errorf("Failed to pipe upload: %s", err)
@@ -282,6 +288,7 @@ func (c *Communicator) run(cmd *exec.Cmd, remote *packersdk.RemoteCmd, stdin io.
 
 	wg := sync.WaitGroup{}
 	repeat := func(w io.Writer, r io.ReadCloser) {
+		//nolint:errcheck
 		io.Copy(w, r)
 		r.Close()
 		wg.Done()
@@ -309,6 +316,7 @@ func (c *Communicator) run(cmd *exec.Cmd, remote *packersdk.RemoteCmd, stdin io.
 
 	if remote.Stdin != nil {
 		go func() {
+			//nolint:errcheck
 			io.Copy(stdin, remote.Stdin)
 			// close stdin to support commands that wait for stdin to be closed before exiting.
 			stdin.Close()
