@@ -4,7 +4,7 @@ go 1.16
 
 require (
 	github.com/aws/aws-sdk-go v1.38.21
-	github.com/hashicorp/aws-sdk-go-base v0.7.0
+	github.com/hashicorp/aws-sdk-go-base v0.7.1
 	github.com/hashicorp/go-cleanhttp v0.5.2
 	github.com/hashicorp/go-version v1.3.0
 	github.com/hashicorp/hcl/v2 v2.10.0
