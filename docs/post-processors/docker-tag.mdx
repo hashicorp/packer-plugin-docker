@@ -57,7 +57,7 @@ An example is shown below, showing only the post-processor configuration:
 {
   "type": "docker-tag",
   "repository": "hashicorp/packer",
-  "tag": "0.7,anothertag"
+  "tags": ["0.7", "anothertag"]
 }
 ```
 </Tab>
@@ -67,7 +67,7 @@ An example is shown below, showing only the post-processor configuration:
 ```hcl
 post-processor "docker-tag" {
   repository = "hashicorp/packer"
-  tag = "0.7,anothertag"
+  tags = ["0.7", "anothertag"]
 }
 ```
 </Tab>
