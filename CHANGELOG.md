@@ -1,3 +1,7 @@
+## 1.0.1
+
+`1.0.1` is the same as `1.0.0`
+
 ## 1.0.0
 * Update packer-plugin-sdk to v0.2.3. [GH-56]
 
