@@ -110,19 +110,23 @@ func (b *Builder) Run(ctx context.Context, ui packersdk.Ui, hook packersdk.Hook)
 		return nil, nil
 	}
 
-	// No errors, must've worked
+	// No errors, must've worked. Build the artifact.
+	stateData := map[string]interface{}{
+		"generated_data": state.Get("generated_data"),
+	}
+
 	var artifact packersdk.Artifact
 	if b.config.Commit {
 		artifact = &ImportArtifact{
 			IdValue:        state.Get("image_id").(string),
 			BuilderIdValue: BuilderIdImport,
 			Driver:         driver,
-			StateData:      map[string]interface{}{"generated_data": state.Get("generated_data")},
+			StateData:      stateData,
 		}
 	} else {
 		artifact = &ExportArtifact{
 			path:      b.config.ExportPath,
-			StateData: map[string]interface{}{"generated_data": state.Get("generated_data")},
+			StateData: stateData,
 		}
 	}
 

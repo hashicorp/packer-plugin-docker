@@ -30,7 +30,7 @@ func TestStepSetGeneratedData_Run(t *testing.T) {
 	}
 
 	sourceSha256 := genData["SourceImageSha256"].(string)
-	if sourceSha256 != "ERR_SOURCE_IMAGE_Sha256_NOT_FOUND" {
-		t.Fatalf("Expected SourceImageSha256 to be ERR_SOURCE_IMAGE_Sha256_NOT_FOUND but was %s", sourceSha256)
+	if sourceSha256 != "ERR_SOURCE_IMAGE_SHA256_NOT_FOUND" {
+		t.Fatalf("Expected SourceImageSha256 to be ERR_SOURCE_IMAGE_SHA256_NOT_FOUND but was %s", sourceSha256)
 	}
 }

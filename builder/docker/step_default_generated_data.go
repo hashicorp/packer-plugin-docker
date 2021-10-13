@@ -20,7 +20,7 @@ type StepDefaultGeneratedData struct {
 func (s *StepDefaultGeneratedData) Run(_ context.Context, state multistep.StateBag) multistep.StepAction {
 	s.GeneratedData.Put("ImageSha256", "ERR_IMAGE_SHA256_NOT_FOUND")
 	s.GeneratedData.Put("SourceImageDigest", "ERR_SOURCE_IMAGE_DIGEST_NOT_FOUND")
-	s.GeneratedData.Put("SourceImageSha256", "ERR_SOURCE_IMAGE_Sha256_NOT_FOUND")
+	s.GeneratedData.Put("SourceImageSha256", "ERR_SOURCE_IMAGE_SHA256_NOT_FOUND")
 
 	return multistep.ActionContinue
 }

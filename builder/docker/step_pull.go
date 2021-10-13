@@ -14,8 +14,33 @@ type StepPull struct {
 	GeneratedData *packerbuilderdata.GeneratedData
 }
 
+func (s *StepPull) storeSourceImageInfo(driver Driver, ui packersdk.Ui, state multistep.StateBag, image string) {
+	// Store data about source image.
+	// Distribution digest is something you can use to pull the image down.
+	sourceDigest, err := driver.Digest(image)
+	if err != nil {
+		err := fmt.Errorf("Error determining source Docker image digest; " +
+			"this image may not have been pushed yet, which means no " +
+			"distribution digest has been created. If you plan to call docker " +
+			"push later, the digest value will be stored then.")
+		ui.Error(err.Error())
+	}
+	state.Put("source_digest", sourceDigest)
+	s.GeneratedData.Put("SourceImageDigest", sourceDigest)
+
+	// Image Id is a shasum that is unique to this image.
+	sourceSha256, err := driver.Sha256(image)
+	if err != nil {
+		err := fmt.Errorf("Error determining source Docker image Id: %s", err)
+		ui.Error(err.Error())
+	}
+	state.Put("source_sha256", sourceSha256)
+	s.GeneratedData.Put("SourceImageSha256", sourceSha256)
+}
+
 func (s *StepPull) Run(ctx context.Context, state multistep.StateBag) multistep.StepAction {
 	ui := state.Get("ui").(packersdk.Ui)
+	driver := state.Get("driver").(Driver)
 	config, ok := state.Get("config").(*Config)
 	if !ok {
 		err := fmt.Errorf("error encountered obtaining docker config")
@@ -25,7 +50,8 @@ func (s *StepPull) Run(ctx context.Context, state multistep.StateBag) multistep.
 	}
 
 	if !config.Pull {
-		log.Println("Pull disabled, won't docker pull")
+		log.Println("Pull disabled, won't call docker pull")
+		s.storeSourceImageInfo(driver, ui, state, config.Image)
 		return multistep.ActionContinue
 	}
 
@@ -46,7 +72,6 @@ func (s *StepPull) Run(ctx context.Context, state multistep.StateBag) multistep.
 		config.LoginPassword = password
 	}
 
-	driver := state.Get("driver").(Driver)
 	if config.Login || config.EcrLogin {
 		ui.Message("Logging in...")
 		err := driver.Login(
@@ -75,24 +100,7 @@ func (s *StepPull) Run(ctx context.Context, state multistep.StateBag) multistep.
 		return multistep.ActionHalt
 	}
 
-	// Store data about source image.
-	// Distribution digest is something you can use to pull the image down.
-	sourceDigest, err := driver.Digest(config.Image)
-	if err != nil {
-		err := fmt.Errorf("Error determining source Docker image digest: %s", err)
-		ui.Error(err.Error())
-	}
-	state.Put("source_digest", sourceDigest)
-	s.GeneratedData.Put("SourceImageDigest", sourceDigest)
-
-	// Image Id is a shasum that is unique to this image.
-	sourceSha256, err := driver.Sha256(config.Image)
-	if err != nil {
-		err := fmt.Errorf("Error determining source Docker image Id: %s", err)
-		ui.Error(err.Error())
-	}
-	state.Put("source_sha256", sourceSha256)
-	s.GeneratedData.Put("SourceImageSha256", sourceSha256)
+	s.storeSourceImageInfo(driver, ui, state, config.Image)
 
 	return multistep.ActionContinue
 }
