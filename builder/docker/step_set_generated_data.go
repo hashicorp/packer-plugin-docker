@@ -22,6 +22,13 @@ func (s *StepSetGeneratedData) Run(_ context.Context, state multistep.StateBag) 
 		}
 	}
 	s.GeneratedData.Put("ImageSha256", sha256)
+
+	imageDigest := "ERR_SOURCE_IMAGE_DIGEST_NOT_FOUND"
+	if digest, ok := state.GetOk("source_digest"); ok {
+		imageDigest = digest
+	}
+	s.GeneratedData.Put("SourceImageDigest", imageDigest)
+
 	return multistep.ActionContinue
 }
 

@@ -32,6 +32,7 @@ func (b *Builder) Prepare(raws ...interface{}) ([]string, []string, error) {
 
 	return []string{
 		"ImageSha256",
+		"SourceImageDigest",
 	}, warnings, nil
 }
 

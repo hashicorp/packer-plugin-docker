@@ -72,6 +72,13 @@ func (s *StepPull) Run(ctx context.Context, state multistep.StateBag) multistep.
 		return multistep.ActionHalt
 	}
 
+	sourceDigest, err := driver.Digest(config.Image)
+	if err != nil {
+		err := fmt.Errorf("Error determining source Docker image digest: %s", err)
+		ui.Error(err.Error())
+	}
+	state.Put("source_digest", sourceDigest)
+
 	return multistep.ActionContinue
 }
 
