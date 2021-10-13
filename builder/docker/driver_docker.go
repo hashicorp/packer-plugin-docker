@@ -160,6 +160,7 @@ func (d *DockerDriver) IPAddress(id string) (string, error) {
 	return strings.TrimSpace(stdout.String()), nil
 }
 
+// Sha256 retrieves the image Id using Docker inspect.
 func (d *DockerDriver) Sha256(id string) (string, error) {
 	var stderr, stdout bytes.Buffer
 	cmd := exec.Command(
@@ -167,6 +168,29 @@ func (d *DockerDriver) Sha256(id string) (string, error) {
 		"inspect",
 		"--format",
 		"{{ .Id }}",
+		id)
+	cmd.Stdout = &stdout
+	cmd.Stderr = &stderr
+	if err := cmd.Run(); err != nil {
+		return "", fmt.Errorf("Error: %s\n\nStderr: %s", err, stderr.String())
+	}
+
+	return strings.TrimSpace(stdout.String()), nil
+}
+
+// Digest retrieves the digest of the image using Docker inspect.
+// Format for the digest is: <repo>@sha256:<shasum>
+// For example:
+// ubuntu@sha256:454054f5bbd571b088db25b662099c6c7b3f0cb78536a2077d54adc48f00cd68
+// This can be considered a source of truth for pointing to a specific image
+// at a specific point in time.
+func (d *DockerDriver) Digest(id string) (string, error) {
+	var stderr, stdout bytes.Buffer
+	cmd := exec.Command(
+		"docker",
+		"inspect",
+		"--format",
+		"{{ ( index .RepoDigests 0 ) }",
 		id)
 	cmd.Stdout = &stdout
 	cmd.Stderr = &stderr
