@@ -190,7 +190,7 @@ func (d *DockerDriver) Digest(id string) (string, error) {
 		"docker",
 		"inspect",
 		"--format",
-		"{{ ( index .RepoDigests 0 ) }",
+		"{{ ( index .RepoDigests 0 ) }}",
 		id)
 	cmd.Stdout = &stdout
 	cmd.Stderr = &stderr
