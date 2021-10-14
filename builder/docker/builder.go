@@ -59,8 +59,13 @@ func (b *Builder) Run(ctx context.Context, ui packersdk.Ui, hook packersdk.Hook)
 	state.Put("driver", driver)
 
 	steps := []multistep.Step{
+		&StepDefaultGeneratedData{
+			GeneratedData: generatedData,
+		},
 		&StepTempDir{},
-		&StepPull{},
+		&StepPull{
+			GeneratedData: generatedData,
+		},
 		&StepRun{},
 		&communicator.StepConnect{
 			Config:    &b.config.Comm,
@@ -81,11 +86,9 @@ func (b *Builder) Run(ctx context.Context, ui packersdk.Ui, hook packersdk.Hook)
 		log.Print("[DEBUG] Container will be discarded")
 	} else if b.config.Commit {
 		log.Print("[DEBUG] Container will be committed")
-		steps = append(steps,
-			new(StepCommit),
-			&StepSetGeneratedData{ // Adds ImageSha256 variable available after StepCommit
-				GeneratedData: generatedData,
-			})
+		steps = append(steps, &StepCommit{
+			GeneratedData: generatedData,
+		})
 	} else if b.config.ExportPath != "" {
 		log.Printf("[DEBUG] Container will be exported to %s", b.config.ExportPath)
 		steps = append(steps, new(StepExport))
