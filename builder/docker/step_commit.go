@@ -6,11 +6,13 @@ import (
 
 	"github.com/hashicorp/packer-plugin-sdk/multistep"
 	packersdk "github.com/hashicorp/packer-plugin-sdk/packer"
+	"github.com/hashicorp/packer-plugin-sdk/packerbuilderdata"
 )
 
 // StepCommit commits the container to a image.
 type StepCommit struct {
-	imageId string
+	imageId       string
+	GeneratedData *packerbuilderdata.GeneratedData
 }
 
 func (s *StepCommit) Run(ctx context.Context, state multistep.StateBag) multistep.StepAction {
@@ -43,9 +45,14 @@ func (s *StepCommit) Run(ctx context.Context, state multistep.StateBag) multiste
 		return multistep.ActionHalt
 	}
 
-	// Save the container ID
+	// Save the container ID to state and to generated data
 	s.imageId = imageId
 	state.Put("image_id", s.imageId)
+	s256, err := driver.Sha256(s.imageId)
+	if err == nil {
+		s.GeneratedData.Put("ImageSha256", s256)
+	}
+
 	ui.Message(fmt.Sprintf("Image ID: %s", s.imageId))
 
 	return multistep.ActionContinue

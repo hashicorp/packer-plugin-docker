@@ -6,6 +6,7 @@ import (
 	"testing"
 
 	"github.com/hashicorp/packer-plugin-sdk/multistep"
+	"github.com/hashicorp/packer-plugin-sdk/packerbuilderdata"
 )
 
 func TestStepPull_impl(t *testing.T) {
@@ -14,11 +15,16 @@ func TestStepPull_impl(t *testing.T) {
 
 func TestStepPull(t *testing.T) {
 	state := testState(t)
-	step := new(StepPull)
-	defer step.Cleanup(state)
 
 	config := state.Get("config").(*Config)
 	driver := state.Get("driver").(*MockDriver)
+	driver.Sha256Result = "sha256:af61410def4ae2aece7c1b8d94b82ef434c8ee76e0e69001230f6636aea58cd1"
+	driver.CommitImageId = "bar"
+
+	step := &StepPull{
+		GeneratedData: &packerbuilderdata.GeneratedData{State: state},
+	}
+	defer step.Cleanup(state)
 
 	// run the step
 	if action := step.Run(context.Background(), state); action != multistep.ActionContinue {
@@ -36,11 +42,16 @@ func TestStepPull(t *testing.T) {
 
 func TestStepPull_error(t *testing.T) {
 	state := testState(t)
-	step := new(StepPull)
-	defer step.Cleanup(state)
 
 	driver := state.Get("driver").(*MockDriver)
 	driver.PullError = errors.New("foo")
+	driver.Sha256Result = "sha256:af61410def4ae2aece7c1b8d94b82ef434c8ee76e0e69001230f6636aea58cd1"
+	driver.CommitImageId = "bar"
+
+	step := &StepPull{
+		GeneratedData: &packerbuilderdata.GeneratedData{State: state},
+	}
+	defer step.Cleanup(state)
 
 	// run the step
 	if action := step.Run(context.Background(), state); action != multistep.ActionHalt {
@@ -55,11 +66,16 @@ func TestStepPull_error(t *testing.T) {
 
 func TestStepPull_login(t *testing.T) {
 	state := testState(t)
-	step := new(StepPull)
-	defer step.Cleanup(state)
 
 	config := state.Get("config").(*Config)
 	driver := state.Get("driver").(*MockDriver)
+	driver.Sha256Result = "sha256:af61410def4ae2aece7c1b8d94b82ef434c8ee76e0e69001230f6636aea58cd1"
+	driver.CommitImageId = "bar"
+
+	step := &StepPull{
+		GeneratedData: &packerbuilderdata.GeneratedData{State: state},
+	}
+	defer step.Cleanup(state)
 
 	config.Login = true
 
@@ -84,13 +100,17 @@ func TestStepPull_login(t *testing.T) {
 
 func TestStepPull_noPull(t *testing.T) {
 	state := testState(t)
-	step := new(StepPull)
-	defer step.Cleanup(state)
 
 	config := state.Get("config").(*Config)
 	config.Pull = false
-
 	driver := state.Get("driver").(*MockDriver)
+	driver.Sha256Result = "sha256:af61410def4ae2aece7c1b8d94b82ef434c8ee76e0e69001230f6636aea58cd1"
+	driver.CommitImageId = "bar"
+
+	step := &StepPull{
+		GeneratedData: &packerbuilderdata.GeneratedData{State: state},
+	}
+	defer step.Cleanup(state)
 
 	// run the step
 	if action := step.Run(context.Background(), state); action != multistep.ActionContinue {

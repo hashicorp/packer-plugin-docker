@@ -6,6 +6,7 @@ import (
 	"testing"
 
 	"github.com/hashicorp/packer-plugin-sdk/multistep"
+	"github.com/hashicorp/packer-plugin-sdk/packerbuilderdata"
 )
 
 func testStepCommitState(t *testing.T) multistep.StateBag {
@@ -20,11 +21,15 @@ func TestStepCommit_impl(t *testing.T) {
 
 func TestStepCommit(t *testing.T) {
 	state := testStepCommitState(t)
-	step := new(StepCommit)
-	defer step.Cleanup(state)
 
 	driver := state.Get("driver").(*MockDriver)
+	driver.Sha256Result = "sha256:af61410def4ae2aece7c1b8d94b82ef434c8ee76e0e69001230f6636aea58cd1"
 	driver.CommitImageId = "bar"
+
+	step := &StepCommit{
+		GeneratedData: &packerbuilderdata.GeneratedData{State: state},
+	}
+	defer step.Cleanup(state)
 
 	// run the step
 	if action := step.Run(context.Background(), state); action != multistep.ActionContinue {
@@ -45,6 +50,13 @@ func TestStepCommit(t *testing.T) {
 	id := idRaw.(string)
 	if id != driver.CommitImageId {
 		t.Fatalf("bad: %#v", id)
+	}
+
+	// Verify the sha256 is stored in generated data
+	genData := state.Get("generated_data").(map[string]interface{})
+	imSha := genData["ImageSha256"].(string)
+	if imSha != driver.Sha256Result {
+		t.Fatalf("Bad: image sha wasn't set properly; received %s", imSha)
 	}
 }
 

@@ -33,8 +33,9 @@ type Config struct {
 	// /app", "EXPOSE 8080" ]
 	Changes []string `mapstructure:"changes"`
 	// If true, the container will be committed to an image rather than exported.
+	// Default `false`. If `commit` is `false`, then either `discard` must be
+	// set to `true` or an `export_path` must be provided.
 	Commit bool `mapstructure:"commit" required:"true"`
-
 	// The directory inside container to mount temp directory from host server
 	// for work [file provisioner](/docs/provisioners/file). This defaults
 	// to c:/packer-files on windows and /packer-files on other systems.
@@ -62,6 +63,11 @@ type Config struct {
 	ExportPath string `mapstructure:"export_path" required:"true"`
 	// The base image for the Docker container that will be started. This image
 	// will be pulled from the Docker registry if it doesn't already exist.
+	// Any value format that you can provide to `docker pull` is valid.
+	// Example: `ubuntu` or `ubuntu:xenial`. If you only provide the repo, Docker
+	// will pull the latest image, so setting `ubuntu` is the same as setting
+	// `ubuntu:latest`. You can also set a distribution digest. For example,
+	// ubuntu@sha256:a0d9e826ab87bd665cfc640598a871b748b4b70a01a4f3d174d4fb02adad07a9
 	Image string `mapstructure:"image" required:"true"`
 	// Set a message for the commit.
 	Message string `mapstructure:"message" required:"true"`

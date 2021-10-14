@@ -33,6 +33,11 @@ type MockDriver struct {
 	Sha256Result string
 	Sha256Err    error
 
+	DigestCalled bool
+	DigestId     string
+	DigestResult string
+	DigestErr    error
+
 	KillCalled bool
 	KillID     string
 	KillError  error
@@ -127,6 +132,12 @@ func (d *MockDriver) Sha256(id string) (string, error) {
 	d.Sha256Called = true
 	d.Sha256Id = id
 	return d.Sha256Result, d.Sha256Err
+}
+
+func (d *MockDriver) Digest(id string) (string, error) {
+	d.DigestCalled = true
+	d.DigestId = id
+	return d.DigestResult, d.DigestErr
 }
 
 func (d *MockDriver) Login(r, u, p string) error {
