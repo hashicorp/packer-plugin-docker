@@ -108,12 +108,39 @@ func (p *PostProcessor) PostProcess(ctx context.Context, ui packersdk.Ui, artifa
 		}
 	}
 
+	// Store digest in state's generated data.
+	digest, err := driver.Digest(artifact.Id())
+	if err != nil {
+		err := fmt.Errorf("Error determining pushed Docker image digest")
+		ui.Error(err.Error())
+	}
+
+	// If artifact is a docker input artifact, re-store the state data.
+	// Otherwise, write what we want to the state data.
+	stateData := map[string]interface{}{"docker_tags": RepoTags}
+
+	// Update the state's generated data with the digest, if it exists, and
+	// continue.
+	data := artifact.State("generated_data")
+
+	castData, ok := data.(map[interface{}]interface{})
+	if ok {
+		castData["Digest"] = digest
+		// The RPC turns our original map[string]interface{} into a
+		// map[interface]interface so we need to turn it back
+		newGenData := map[string]interface{}{}
+		for k, v := range castData {
+			newGenData[k.(string)] = v
+		}
+		stateData["generated_data"] = newGenData
+	}
+
 	// Build the artifact
 	artifact = &docker.ImportArtifact{
 		BuilderIdValue: BuilderId,
 		Driver:         driver,
 		IdValue:        lastTaggedRepo,
-		StateData:      map[string]interface{}{"docker_tags": RepoTags},
+		StateData:      stateData,
 	}
 
 	// If we tag an image and then delete it, there was no point in creating the

@@ -127,11 +127,35 @@ func (p *PostProcessor) PostProcess(ctx context.Context, ui packersdk.Ui, artifa
 		}
 	}
 
+	// Store digest in state's generated data.
+	digest, err := driver.Digest(artifact.Id())
+	if err != nil {
+		err := fmt.Errorf("Error determining pushed Docker image digest")
+		ui.Error(err.Error())
+	}
+
+	stateData := map[string]interface{}{"docker_tags": tags}
+	// Update the state's generated data with the digest, if it exists, and
+	// continue.
+	data := artifact.State("generated_data")
+
+	castData, ok := data.(map[interface{}]interface{})
+	if ok {
+		castData["Digest"] = digest
+		// The RPC turns our original map[string]interface{} into a
+		// map[interface]interface so we need to turn it back
+		newGenData := map[string]interface{}{}
+		for k, v := range castData {
+			newGenData[k.(string)] = v
+		}
+		stateData["generated_data"] = newGenData
+	}
+
 	artifact = &docker.ImportArtifact{
 		BuilderIdValue: BuilderIdImport,
 		Driver:         driver,
 		IdValue:        names[0],
-		StateData:      map[string]interface{}{"docker_tags": tags},
+		StateData:      stateData,
 	}
 
 	return artifact, true, false, nil
