@@ -4,7 +4,7 @@
 * Add `SourceImageDigest` and `ImageSha256` as shared builder information.
     [GH-75].
 * Update plugin to Go 1.17
-* Update packer-plugin-sdk to v0.2.7 [GH-]
+* Update packer-plugin-sdk to v0.2.7 [GH-74]
 * Small refactor to main driver to support the capturing of the image digest
     for the source image. [GH-75]
 
