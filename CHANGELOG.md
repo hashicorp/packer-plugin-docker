@@ -1,4 +1,11 @@
-## 1.0.2 (Upcoming)
+## 1.0.2 (October 18, 2021)
+
+### IMPROVEMENTS:
+* Add `SourceImageDigest` and `ImageSha256` as shared builder information.
+    [GH-75].
+* Bump plugin to use Go 1.17
+* Small refactor to main driver to support the capturing of the image digest
+    for the source image. [GH-75]
 
 ## 1.0.1 (June 15, 2021)
 
