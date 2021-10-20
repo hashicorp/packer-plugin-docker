@@ -1,5 +1,12 @@
 ## 1.0.2 (October 18, 2021)
 
+### NOTES:
+Support for the HCP Packer registry is currently in beta and requires 
+Packer v1.7.7 [GH-75]
+
+### FEATURES:
+* Add HCP Packer registry image metadata for all artifacts. [GH-75]
+
 ### IMPROVEMENTS:
 * Add `SourceImageDigest` and `ImageSha256` as shared builder information.
     [GH-75].
