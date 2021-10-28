@@ -95,22 +95,20 @@ func (a *ImportArtifact) stateHCPPackerRegistryMetadata() interface{} {
 		log.Printf("No generated data exists in state. Artifact: %#v", a)
 		return img
 	}
-	if ok {
-		img.SourceImageID = data["SourceImageSha256"].(string)
-		labels["SourceImageDigest"] = data["SourceImageDigest"].(string)
-		// This is the image's sha that we store as the image id. We store it
-		// here as well becasue there is no guarantee this is the value stored
-		// on the main artifact id value.
-		labels["ImageSha256"] = data["ImageSha256"].(string)
-		// The docker tag and docker push post-processors store the repo:tag
-		// combination here, whereas the docker builder stores the image's
-		// sha256 id. We store this for posterity, but the image id needs to be
-		// the sha256.
-		labels["PackerArtifactID"] = a.Id()
-		registryimage.SetLabels(labels)
-		// Overwrite ID with
-		img.ImageID = data["ImageSha256"].(string)
-	}
+
+	img.SourceImageID = data["SourceImageSha256"].(string)
+	img.Labels["SourceImageDigest"] = data["SourceImageDigest"].(string)
+	// This is the image's sha that we store as the image id. We store it
+	// here as well becasue there is no guarantee this is the value stored
+	// on the main artifact id value.
+	img.Labels["ImageSha256"] = data["ImageSha256"].(string)
+	// The docker tag and docker push post-processors store the repo:tag
+	// combination here, whereas the docker builder stores the image's
+	// sha256 id. We store this for posterity, but the image id needs to be
+	// the sha256.
+	img.Labels["PackerArtifactID"] = a.Id()
+	// Overwrite ID with
+	img.ImageID = data["ImageSha256"].(string)
 
 	return img
 }
