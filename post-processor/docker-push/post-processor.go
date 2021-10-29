@@ -139,17 +139,18 @@ func (p *PostProcessor) PostProcess(ctx context.Context, ui packersdk.Ui, artifa
 	// continue.
 	data := artifact.State("generated_data")
 
+	newGenData := map[string]interface{}{}
 	castData, ok := data.(map[interface{}]interface{})
 	if ok {
-		castData["Digest"] = digest
-		// The RPC turns our original map[string]interface{} into a
-		// map[interface]interface so we need to turn it back
-		newGenData := map[string]interface{}{}
 		for k, v := range castData {
 			newGenData[k.(string)] = v
 		}
-		stateData["generated_data"] = newGenData
 	}
+
+	newGenData["Digest"] = digest
+	// The RPC turns our original map[string]interface{} into a
+	// map[interface]interface so we need to turn it back
+	stateData["generated_data"] = newGenData
 
 	artifact = &docker.ImportArtifact{
 		BuilderIdValue: BuilderIdImport,
