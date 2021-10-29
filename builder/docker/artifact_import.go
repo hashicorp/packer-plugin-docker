@@ -107,7 +107,13 @@ func (a *ImportArtifact) stateHCPPackerRegistryMetadata() interface{} {
 	// sha256 id. We store this for posterity, but the image id needs to be
 	// the sha256.
 	img.Labels["PackerArtifactID"] = a.Id()
-	// Overwrite ID with
+	// Digest exists in state if we ran the packer push postprocessor.
+	digest, ok := data["Digest"].(string)
+	if ok {
+		img.Labels["ImageDigest"] = digest
+	}
+
+	// Overwrite ID with image sha
 	img.ImageID = data["ImageSha256"].(string)
 
 	return img
