@@ -1,7 +1,15 @@
+## 1.0.3 (October 29, 2021)
+
+### IMPROVEMENTS:
+* Add ImageDigest label to HCP Packer registry image metadata, if available. [GH-79] [GH-80]
+
+### BUG FIXES:
+* Properly set ImageID and related HCP Packer registry labels when set. [GH-78]
+
 ## 1.0.2 (October 18, 2021)
 
 ### NOTES:
-Support for the HCP Packer registry is currently in beta and requires 
+Support for the HCP Packer registry is currently in beta and requires
 Packer v1.7.7 [GH-75]
 
 ### FEATURES:
