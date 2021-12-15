@@ -130,8 +130,7 @@ func (p *PostProcessor) PostProcess(ctx context.Context, ui packersdk.Ui, artifa
 	// Store digest in state's generated data.
 	digest, err := driver.Digest(artifact.Id())
 	if err != nil {
-		err := fmt.Errorf("Error determining pushed Docker image digest")
-		ui.Error(err.Error())
+		ui.Message("Unable to determine pushed Docker image digest")
 	}
 
 	stateData := map[string]interface{}{"docker_tags": tags}
