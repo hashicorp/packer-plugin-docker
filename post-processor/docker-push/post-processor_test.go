@@ -3,6 +3,8 @@ package dockerpush
 import (
 	"bytes"
 	"context"
+	"fmt"
+	"strings"
 	"testing"
 
 	"github.com/hashicorp/packer-plugin-docker/builder/docker"
@@ -15,6 +17,15 @@ func testUi() *packersdk.BasicUi {
 		Reader: new(bytes.Buffer),
 		Writer: new(bytes.Buffer),
 	}
+}
+
+// This reads the output from the bytes.Buffer in our test UI
+// and then resets the buffer.
+func readWriter(ui *packersdk.BasicUi) (resultString string) {
+	buffer := ui.Writer.(*bytes.Buffer)
+	resultString = buffer.String()
+	buffer.Reset()
+	return
 }
 
 func TestPostProcessor_ImplementsPostProcessor(t *testing.T) {
@@ -112,6 +123,47 @@ func TestPostProcessor_PostProcess_tags(t *testing.T) {
 	if !driver.PushCalled {
 		t.Fatal("should call push")
 	}
+	if driver.PushName != "hashicorp/ubuntu:precise" {
+		t.Fatalf("bad name: %s", driver.PushName)
+	}
+	if result.Id() != "hashicorp/ubuntu:precise" {
+		t.Fatal("bad image id")
+	}
+}
+
+func TestPostProcessor_PostProcess_digestWarning(t *testing.T) {
+	driver := &docker.MockDriver{}
+	p := &PostProcessor{Driver: driver}
+	artifact := &packersdk.MockArtifact{
+		BuilderIdValue: dockerimport.BuilderId,
+		IdValue:        "hashicorp/ubuntu:precise",
+	}
+
+	driver.DigestErr = fmt.Errorf("I'm a generic digest error! The Packer Docker Plugin should handle me as a warning")
+
+	testUi := testUi()
+	result, keep, forceOverride, err := p.PostProcess(context.Background(), testUi, artifact)
+	resultString := readWriter(testUi)
+	if _, ok := result.(packersdk.Artifact); !ok {
+		t.Fatal("should be instance of Artifact")
+	}
+	if !keep {
+		t.Fatal("should keep")
+	}
+	if forceOverride {
+		t.Fatal("Should default to keep, but not override user wishes")
+	}
+	if err != nil {
+		t.Fatalf("err: %s", err)
+	}
+	if !driver.PushCalled {
+		t.Fatal("should call push")
+	}
+	// Check for warning text
+	if !strings.Contains(resultString, "Unable to determine digest for source image, ignoring it for now") {
+		t.Fatal(resultString)
+	}
+	// Should still succeed after digest warning
 	if driver.PushName != "hashicorp/ubuntu:precise" {
 		t.Fatalf("bad name: %s", driver.PushName)
 	}
