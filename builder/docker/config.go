@@ -75,6 +75,8 @@ type Config struct {
 	// defaults to false if not set.
 	Privileged bool `mapstructure:"privileged" required:"false"`
 	Pty        bool
+	// Set the container runtime.
+	Runtime string `mapstructure:"runtime" required:"false"`
 	// If true, the configured image will be pulled using `docker pull` prior
 	// to use. Otherwise, it is assumed the image already exists and can be
 	// used. This defaults to true if not set.
