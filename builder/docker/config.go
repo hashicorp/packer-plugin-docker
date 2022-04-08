@@ -75,7 +75,12 @@ type Config struct {
 	// defaults to false if not set.
 	Privileged bool `mapstructure:"privileged" required:"false"`
 	Pty        bool
-	// Set the container runtime.
+	// Set the container runtime. A runtime different from the one installed
+	// by default with Docker (`runc`) must be installed and configured.
+	// The possible values are (non-exhaustive list):
+	// `runsc` for [gVisor](https://gvisor.dev/),
+	// `kata-runtime` for [Kata Containers](https://katacontainers.io/),
+	// `sysbox-runc` for [Nestybox](https://www.nestybox.com/).
 	Runtime string `mapstructure:"runtime" required:"false"`
 	// If true, the configured image will be pulled using `docker pull` prior
 	// to use. Otherwise, it is assumed the image already exists and can be
