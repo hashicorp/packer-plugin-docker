@@ -28,6 +28,13 @@
 - `privileged` (bool) - If true, run the docker container with the `--privileged` flag. This
   defaults to false if not set.
 
+- `runtime` (string) - Set the container runtime. A runtime different from the one installed
+  by default with Docker (`runc`) must be installed and configured.
+  The possible values are (non-exhaustive list):
+  `runsc` for [gVisor](https://gvisor.dev/),
+  `kata-runtime` for [Kata Containers](https://katacontainers.io/),
+  `sysbox-runc` for [Nestybox](https://www.nestybox.com/).
+
 - `pull` (bool) - If true, the configured image will be pulled using `docker pull` prior
   to use. Otherwise, it is assumed the image already exists and can be
   used. This defaults to true if not set.

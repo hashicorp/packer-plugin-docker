@@ -322,6 +322,9 @@ func (d *DockerDriver) StartContainer(config *ContainerConfig) (string, error) {
 	if config.Privileged {
 		args = append(args, "--privileged")
 	}
+	if config.Runtime != "" {
+		args = append(args, "--runtime", config.Runtime)
+	}
 	for _, v := range config.TmpFs {
 		args = append(args, "--tmpfs", v)
 	}

@@ -81,6 +81,7 @@ type FlatConfig struct {
 	Message                   *string           `mapstructure:"message" required:"true" cty:"message" hcl:"message"`
 	Privileged                *bool             `mapstructure:"privileged" required:"false" cty:"privileged" hcl:"privileged"`
 	Pty                       *bool             `cty:"pty" hcl:"pty"`
+	Runtime                   *string           `mapstructure:"runtime" required:"false" cty:"runtime" hcl:"runtime"`
 	Pull                      *bool             `mapstructure:"pull" required:"false" cty:"pull" hcl:"pull"`
 	RunCommand                []string          `mapstructure:"run_command" required:"false" cty:"run_command" hcl:"run_command"`
 	TmpFs                     []string          `mapstructure:"tmpfs" required:"false" cty:"tmpfs" hcl:"tmpfs"`
@@ -181,6 +182,7 @@ func (*FlatConfig) HCL2Spec() map[string]hcldec.Spec {
 		"message":                      &hcldec.AttrSpec{Name: "message", Type: cty.String, Required: false},
 		"privileged":                   &hcldec.AttrSpec{Name: "privileged", Type: cty.Bool, Required: false},
 		"pty":                          &hcldec.AttrSpec{Name: "pty", Type: cty.Bool, Required: false},
+		"runtime":                      &hcldec.AttrSpec{Name: "runtime", Type: cty.String, Required: false},
 		"pull":                         &hcldec.AttrSpec{Name: "pull", Type: cty.Bool, Required: false},
 		"run_command":                  &hcldec.AttrSpec{Name: "run_command", Type: cty.List(cty.String), Required: false},
 		"tmpfs":                        &hcldec.AttrSpec{Name: "tmpfs", Type: cty.List(cty.String), Required: false},

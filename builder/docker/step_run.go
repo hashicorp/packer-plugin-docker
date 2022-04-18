@@ -31,6 +31,7 @@ func (s *StepRun) Run(ctx context.Context, state multistep.StateBag) multistep.S
 		CapAdd:     config.CapAdd,
 		CapDrop:    config.CapDrop,
 		Privileged: config.Privileged,
+		Runtime:    config.Runtime,
 	}
 
 	for host, container := range config.Volumes {
