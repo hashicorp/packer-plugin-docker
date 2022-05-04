@@ -70,7 +70,7 @@ func (p *PostProcessor) PostProcess(ctx context.Context, ui packersdk.Ui, artifa
 
 	driver := p.Driver
 	if driver == nil {
-		var tmpConfigDir string
+		var configDir string
 
 		if _, ok := os.LookupEnv("DOCKER_CONFIG"); !ok {
 			ui.Message("Creating temporary Docker configuration directory")
@@ -79,7 +79,7 @@ func (p *PostProcessor) PostProcess(ctx context.Context, ui packersdk.Ui, artifa
 				return nil, false, false, fmt.Errorf(
 					"Error creating temporary Docker configuration directory: %s", err)
 			}
-			tmpConfigDir = tmpDir
+			configDir = tmpDir
 
 			defer func() {
 				ui.Message("Removing temporary Docker configuration directory")
@@ -94,7 +94,7 @@ func (p *PostProcessor) PostProcess(ctx context.Context, ui packersdk.Ui, artifa
 		driver = &docker.DockerDriver{
 			Ctx:       &p.config.ctx,
 			Ui:        ui,
-			ConfigDir: tmpConfigDir,
+			ConfigDir: configDir,
 		}
 	}
 
