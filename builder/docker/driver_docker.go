@@ -20,6 +20,11 @@ type DockerDriver struct {
 	Ui  packersdk.Ui
 	Ctx *interpolate.Context
 
+	// The directory Docker should use to store its client configuration.
+	// Provides an isolated client configuration to each Docker operation to
+	// prevent race conditions.
+	ConfigDir string
+
 	l sync.Mutex
 }
 
@@ -220,8 +225,7 @@ func (d *DockerDriver) Login(repo, user, pass string) error {
 		return err
 	}
 
-	cmd := exec.Command("docker")
-	cmd.Args = append(cmd.Args, "login")
+	cmd := d.newCommandWithConfig("login")
 
 	if user != "" {
 		cmd.Args = append(cmd.Args, "-u", user)
@@ -260,24 +264,26 @@ func (d *DockerDriver) Login(repo, user, pass string) error {
 }
 
 func (d *DockerDriver) Logout(repo string) error {
-	args := []string{"logout"}
+	cmd := d.newCommandWithConfig("logout")
+
 	if repo != "" {
-		args = append(args, repo)
+		cmd.Args = append(cmd.Args, repo)
 	}
 
-	cmd := exec.Command("docker", args...)
 	err := runAndStream(cmd, d.Ui)
 	d.l.Unlock()
 	return err
 }
 
 func (d *DockerDriver) Pull(image string) error {
-	cmd := exec.Command("docker", "pull", image)
+	cmd := d.newCommandWithConfig("pull", image)
+
 	return runAndStream(cmd, d.Ui)
 }
 
 func (d *DockerDriver) Push(name string) error {
-	cmd := exec.Command("docker", "push", name)
+	cmd := d.newCommandWithConfig("push", name)
+
 	return runAndStream(cmd, d.Ui)
 }
 
@@ -452,4 +458,16 @@ func (d *DockerDriver) Version() (*version.Version, error) {
 	}
 
 	return version.NewVersion(string(match[0]))
+}
+
+func (d *DockerDriver) newCommandWithConfig(args ...string) *exec.Cmd {
+	cmd := exec.Command("docker")
+
+	if d.ConfigDir != "" {
+		cmd.Args = append(cmd.Args, "--config", d.ConfigDir)
+	}
+
+	cmd.Args = append(cmd.Args, args...)
+
+	return cmd
 }

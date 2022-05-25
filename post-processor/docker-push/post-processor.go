@@ -5,6 +5,7 @@ package dockerpush
 import (
 	"context"
 	"fmt"
+	"os"
 
 	"github.com/hashicorp/hcl/v2/hcldec"
 	"github.com/hashicorp/packer-plugin-docker/builder/docker"
@@ -69,8 +70,32 @@ func (p *PostProcessor) PostProcess(ctx context.Context, ui packersdk.Ui, artifa
 
 	driver := p.Driver
 	if driver == nil {
+		var configDir string
+
+		if _, ok := os.LookupEnv("DOCKER_CONFIG"); !ok {
+			ui.Message("Creating temporary Docker configuration directory")
+			tmpDir, err := os.MkdirTemp("", "packer")
+			if err != nil {
+				return nil, false, false, fmt.Errorf(
+					"Error creating temporary Docker configuration directory: %s", err)
+			}
+			configDir = tmpDir
+
+			defer func() {
+				ui.Message("Removing temporary Docker configuration directory")
+				if err := os.RemoveAll(tmpDir); err != nil {
+					ui.Error(
+						fmt.Sprintf("Error removing temporary Docker configuration directory: %s", err))
+				}
+			}()
+		}
+
 		// If no driver is set, then we use the real driver
-		driver = &docker.DockerDriver{Ctx: &p.config.ctx, Ui: ui}
+		driver = &docker.DockerDriver{
+			Ctx:       &p.config.ctx,
+			Ui:        ui,
+			ConfigDir: configDir,
+		}
 	}
 
 	if p.config.EcrLogin {
