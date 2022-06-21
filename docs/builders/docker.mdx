@@ -296,6 +296,8 @@ You must specify (only) one of `commit`, `discard`, or `export_path`.
   running on a windows host. This is necessary for building Windows
   containers, because our normal docker bindings do not work for them.
 
+- `platform` (string) - Set platform if server is multi-platform capable.
+
 - `login` (bool) - This is used to login to dockerhub to pull a private base container. For
   pushing to dockerhub, see the docker post-processors
 

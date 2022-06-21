@@ -23,6 +23,7 @@ type FlatConfig struct {
 	LoginPassword       *string           `mapstructure:"login_password" cty:"login_password" hcl:"login_password"`
 	LoginServer         *string           `mapstructure:"login_server" cty:"login_server" hcl:"login_server"`
 	EcrLogin            *bool             `mapstructure:"ecr_login" cty:"ecr_login" hcl:"ecr_login"`
+	Platform            *string           `mapstructure:"platform" cty:"platform" hcl:"platform"`
 	AccessKey           *string           `mapstructure:"aws_access_key" required:"false" cty:"aws_access_key" hcl:"aws_access_key"`
 	SecretKey           *string           `mapstructure:"aws_secret_key" required:"false" cty:"aws_secret_key" hcl:"aws_secret_key"`
 	Token               *string           `mapstructure:"aws_token" required:"false" cty:"aws_token" hcl:"aws_token"`
@@ -54,6 +55,7 @@ func (*FlatConfig) HCL2Spec() map[string]hcldec.Spec {
 		"login_password":             &hcldec.AttrSpec{Name: "login_password", Type: cty.String, Required: false},
 		"login_server":               &hcldec.AttrSpec{Name: "login_server", Type: cty.String, Required: false},
 		"ecr_login":                  &hcldec.AttrSpec{Name: "ecr_login", Type: cty.Bool, Required: false},
+		"platform":                   &hcldec.AttrSpec{Name: "platform", Type: cty.String, Required: false},
 		"aws_access_key":             &hcldec.AttrSpec{Name: "aws_access_key", Type: cty.String, Required: false},
 		"aws_secret_key":             &hcldec.AttrSpec{Name: "aws_secret_key", Type: cty.String, Required: false},
 		"aws_token":                  &hcldec.AttrSpec{Name: "aws_token", Type: cty.String, Required: false},
