@@ -22,6 +22,7 @@ type Config struct {
 	Repository string   `mapstructure:"repository"`
 	Tag        string   `mapstructure:"tag"`
 	Changes    []string `mapstructure:"changes"`
+	Platform   string   `mapstructure:"platform"`
 
 	ctx interpolate.Context
 }
@@ -73,7 +74,7 @@ func (p *PostProcessor) PostProcess(ctx context.Context, ui packersdk.Ui, artifa
 
 	ui.Message("Importing image: " + artifact.Id())
 	ui.Message("Repository: " + importRepo)
-	id, err := driver.Import(artifact.Files()[0], p.config.Changes, importRepo)
+	id, err := driver.Import(artifact.Files()[0], p.config.Changes, importRepo, p.config.Platform)
 	if err != nil {
 		return nil, false, false, err
 	}

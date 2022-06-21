@@ -101,13 +101,17 @@ func (d *DockerDriver) Export(id string, dst io.Writer) error {
 	return nil
 }
 
-func (d *DockerDriver) Import(path string, changes []string, repo string) (string, error) {
+func (d *DockerDriver) Import(path string, changes []string, repo string, platform string) (string, error) {
 	var stdout, stderr bytes.Buffer
 
 	args := []string{"import"}
 
 	for _, change := range changes {
 		args = append(args, "--change", change)
+	}
+
+	if platform != "" {
+		args = append(args, "--platform", platform)
 	}
 
 	args = append(args, "-")
@@ -275,14 +279,22 @@ func (d *DockerDriver) Logout(repo string) error {
 	return err
 }
 
-func (d *DockerDriver) Pull(image string) error {
+func (d *DockerDriver) Pull(image string, platform string) error {
 	cmd := d.newCommandWithConfig("pull", image)
+
+	if platform != "" {
+		cmd.Args = append(cmd.Args, "--platform", platform)
+	}
 
 	return runAndStream(cmd, d.Ui)
 }
 
-func (d *DockerDriver) Push(name string) error {
+func (d *DockerDriver) Push(name string, platform string) error {
 	cmd := d.newCommandWithConfig("push", name)
+
+	if platform != "" {
+		cmd.Args = append(cmd.Args, "--platform", platform)
+	}
 
 	return runAndStream(cmd, d.Ui)
 }
@@ -330,6 +342,9 @@ func (d *DockerDriver) StartContainer(config *ContainerConfig) (string, error) {
 	}
 	if config.Runtime != "" {
 		args = append(args, "--runtime", config.Runtime)
+	}
+	if config.Platform != "" {
+		args = append(args, "--platform", config.Platform)
 	}
 	for _, v := range config.TmpFs {
 		args = append(args, "--tmpfs", v)

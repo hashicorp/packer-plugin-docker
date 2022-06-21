@@ -27,6 +27,7 @@ type Config struct {
 	LoginPassword          string `mapstructure:"login_password"`
 	LoginServer            string `mapstructure:"login_server"`
 	EcrLogin               bool   `mapstructure:"ecr_login"`
+	Platform               string `mapstructure:"platform"`
 	docker.AwsAccessConfig `mapstructure:",squash"`
 
 	ctx interpolate.Context
@@ -147,7 +148,7 @@ func (p *PostProcessor) PostProcess(ctx context.Context, ui packersdk.Ui, artifa
 	// Get the name.
 	for _, name := range names {
 		ui.Message("Pushing: " + name)
-		if err := driver.Push(name); err != nil {
+		if err := driver.Push(name, p.config.Platform); err != nil {
 			return nil, false, false, err
 		}
 	}

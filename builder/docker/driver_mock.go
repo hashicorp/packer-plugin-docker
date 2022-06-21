@@ -17,11 +17,12 @@ type MockDriver struct {
 	DeleteImageId     string
 	DeleteImageErr    error
 
-	ImportCalled bool
-	ImportPath   string
-	ImportRepo   string
-	ImportId     string
-	ImportErr    error
+	ImportCalled   bool
+	ImportPath     string
+	ImportRepo     string
+	ImportId       string
+	ImportPlatform string
+	ImportErr      error
 
 	IPAddressCalled bool
 	IPAddressID     string
@@ -52,9 +53,10 @@ type MockDriver struct {
 	LogoutRepo   string
 	LogoutErr    error
 
-	PushCalled bool
-	PushName   string
-	PushErr    error
+	PushCalled   bool
+	PushName     string
+	PushPlatform string
+	PushErr      error
 
 	SaveImageCalled bool
 	SaveImageId     string
@@ -79,6 +81,7 @@ type MockDriver struct {
 	ExportID     string
 	PullCalled   bool
 	PullImage    string
+	PullPlatform string
 	StartCalled  bool
 	StartConfig  *ContainerConfig
 	StopCalled   bool
@@ -115,10 +118,11 @@ func (d *MockDriver) Export(id string, dst io.Writer) error {
 	return d.ExportError
 }
 
-func (d *MockDriver) Import(path string, changes []string, repo string) (string, error) {
+func (d *MockDriver) Import(path string, changes []string, repo string, platform string) (string, error) {
 	d.ImportCalled = true
 	d.ImportPath = path
 	d.ImportRepo = repo
+	d.ImportPlatform = platform
 	return d.ImportId, d.ImportErr
 }
 
@@ -154,15 +158,17 @@ func (d *MockDriver) Logout(r string) error {
 	return d.LogoutErr
 }
 
-func (d *MockDriver) Pull(image string) error {
+func (d *MockDriver) Pull(image string, platform string) error {
 	d.PullCalled = true
 	d.PullImage = image
+	d.PullPlatform = platform
 	return d.PullError
 }
 
-func (d *MockDriver) Push(name string) error {
+func (d *MockDriver) Push(name string, platform string) error {
 	d.PushCalled = true
 	d.PushName = name
+	d.PushPlatform = platform
 	return d.PushErr
 }
 
