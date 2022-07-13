@@ -112,6 +112,8 @@ type Config struct {
 	// running on a windows host. This is necessary for building Windows
 	// containers, because our normal docker bindings do not work for them.
 	WindowsContainer bool `mapstructure:"windows_container" required:"false"`
+	// Set platform if server is multi-platform capable
+	Platform string `mapstructure:"platform" required:"false"`
 
 	// This is used to login to dockerhub to pull a private base container. For
 	// pushing to dockerhub, see the docker post-processors

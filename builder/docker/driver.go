@@ -20,7 +20,7 @@ type Driver interface {
 	Export(id string, dst io.Writer) error
 
 	// Import imports a container from a tar file
-	Import(path string, changes []string, repo string) (string, error)
+	Import(path string, changes []string, repo string, platform string) (string, error)
 
 	// IPAddress returns the address of the container that can be used
 	// for external access.
@@ -40,10 +40,10 @@ type Driver interface {
 	Logout(repo string) error
 
 	// Pull should pull down the given image.
-	Pull(image string) error
+	Pull(image string, platform string) error
 
 	// Push pushes an image to a Docker index/registry.
-	Push(name string) error
+	Push(name string, platform string) error
 
 	// Save an image with the given ID to the given writer.
 	SaveImage(id string, dst io.Writer) error
@@ -79,6 +79,7 @@ type ContainerConfig struct {
 	TmpFs      []string
 	Privileged bool
 	Runtime    string
+	Platform   string
 }
 
 // This is the template that is used for the RunCommand in the ContainerConfig.

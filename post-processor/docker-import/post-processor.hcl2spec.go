@@ -21,6 +21,7 @@ type FlatConfig struct {
 	Repository          *string           `mapstructure:"repository" cty:"repository" hcl:"repository"`
 	Tag                 *string           `mapstructure:"tag" cty:"tag" hcl:"tag"`
 	Changes             []string          `mapstructure:"changes" cty:"changes" hcl:"changes"`
+	Platform            *string           `mapstructure:"platform" cty:"platform" hcl:"platform"`
 }
 
 // FlatMapstructure returns a new FlatConfig.
@@ -46,6 +47,7 @@ func (*FlatConfig) HCL2Spec() map[string]hcldec.Spec {
 		"repository":                 &hcldec.AttrSpec{Name: "repository", Type: cty.String, Required: false},
 		"tag":                        &hcldec.AttrSpec{Name: "tag", Type: cty.String, Required: false},
 		"changes":                    &hcldec.AttrSpec{Name: "changes", Type: cty.List(cty.String), Required: false},
+		"platform":                   &hcldec.AttrSpec{Name: "platform", Type: cty.String, Required: false},
 	}
 	return s
 }
