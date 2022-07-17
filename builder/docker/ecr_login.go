@@ -5,8 +5,10 @@ package docker
 import (
 	"encoding/base64"
 	"fmt"
+	"github.com/aws/aws-sdk-go/service/ecrpublic"
 	"log"
 	"net/http"
+	"net/url"
 	"regexp"
 	"strings"
 
@@ -38,9 +40,119 @@ type AwsAccessConfig struct {
 	Profile string `mapstructure:"aws_profile" required:"false"`
 }
 
-// Get a login token for Amazon AWS ECR. Returns username and password
+type ECRType string
+
+const (
+	Public  ECRType = "public"
+	Private ECRType = "private"
+	Invalid ECRType = "invalid"
+)
+
+const EcrPublicHost = "public.ecr.aws"
+
+// EcrPublicApiRegion : The Amazon ECR Public registry requires authentication in the us-east-1 Region,
+// so you need to specify --region us-east-1 each time you authenticate
+const EcrPublicApiRegion = "us-east-1"
+
+// GetEcrType : Get ECR type (Public or Private) based on the given URL.
+// If the URL can't be parsed the function returns Invalid.
+func (c *AwsAccessConfig) GetEcrType(ecrUrl string) (ECRType, error) {
+	_, err := url.ParseRequestURI(ecrUrl)
+	if err != nil {
+		return Invalid, err
+	}
+
+	u, err := url.Parse(ecrUrl)
+	if err != nil || u.Scheme == "" || u.Host == "" {
+		return Invalid, err
+	}
+
+	if u.Host == EcrPublicHost {
+		return Public, nil
+	}
+	return Private, nil
+}
+
+// PublicEcrLogin : Get a login token for Amazon AWS ECR Public. Returns username and password
+// or an error.
+func (c *AwsAccessConfig) PublicEcrLogin(ecrUrl string) (string, string, error) {
+	config := aws.NewConfig().WithCredentialsChainVerboseErrors(true)
+	config = config.WithRegion(EcrPublicApiRegion)
+
+	config = config.WithHTTPClient(cleanhttp.DefaultClient())
+	transport := config.HTTPClient.Transport.(*http.Transport)
+	transport.Proxy = http.ProxyFromEnvironment
+
+	// Figure out which possible credential providers are valid; test that we
+	// can get credentials via the selected providers, and set the providers in
+	// the config.
+	creds, err := c.GetCredentials(config)
+	if err != nil {
+		return "", "", fmt.Errorf(err.Error())
+	}
+	config.WithCredentials(creds)
+
+	// Create session options based on our AWS config
+	opts := session.Options{
+		SharedConfigState: session.SharedConfigEnable,
+		Config:            *config,
+	}
+
+	if c.Profile != "" {
+		opts.Profile = c.Profile
+	}
+
+	sess, err := session.NewSessionWithOptions(opts)
+	if err != nil {
+		return "", "", err
+	}
+	session := sess
+
+	cp, err := session.Config.Credentials.Get()
+
+	if err != nil {
+		return "", "", fmt.Errorf("failed to create session: %s", err)
+	}
+
+	service := ecrpublic.New(session)
+	params := &ecrpublic.GetAuthorizationTokenInput{}
+
+	resp, err := service.GetAuthorizationToken(params)
+	if err != nil {
+		return "", "", fmt.Errorf(err.Error())
+	}
+
+	auth, err := base64.StdEncoding.DecodeString(*resp.AuthorizationData.AuthorizationToken)
+	if err != nil {
+		return "", "", fmt.Errorf("error decoding ECR Public AuthorizationToken: %s", err)
+	}
+
+	authParts := strings.SplitN(string(auth), ":", 2)
+	log.Printf("Successfully got login for ECR Public: %s", ecrUrl)
+
+	username := authParts[0]
+	password := authParts[1]
+
+	return username, password, nil
+}
+
+// EcrGetLogin Get a login token for Amazon AWS ECR. Returns username and password
 // or an error.
 func (c *AwsAccessConfig) EcrGetLogin(ecrUrl string) (string, string, error) {
+
+	// Check ECR Type
+	ecrType, parsingErr := c.GetEcrType(ecrUrl)
+	if parsingErr != nil {
+		errMsg := "failed to parse the ECR URL: %v" +
+			"\n%v" +
+			"\nit should be either on the form `public.ecr.aws/<registry_alias>/<registry_name>` or " +
+			"`<account number>.dkr.ecr.<region>.amazonaws.com`"
+		return "", "", fmt.Errorf(errMsg, ecrUrl, parsingErr)
+	}
+
+	if ecrType == Public {
+		return c.PublicEcrLogin(ecrUrl)
+	}
 
 	exp := regexp.MustCompile(`(?:http://|https://|)([0-9]*)\.dkr\.ecr\.(.*)\.amazonaws\.com.*`)
 	splitUrl := exp.FindStringSubmatch(ecrUrl)
