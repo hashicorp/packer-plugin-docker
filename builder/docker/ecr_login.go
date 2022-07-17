@@ -109,10 +109,10 @@ func (c *AwsAccessConfig) PublicEcrLogin(ecrUrl string) (string, string, error) 
 	session := sess
 
 	cp, err := session.Config.Credentials.Get()
-
 	if err != nil {
 		return "", "", fmt.Errorf("failed to create session: %s", err)
 	}
+	log.Printf("[INFO] AWS authentication used: %q", cp.ProviderName)
 
 	service := ecrpublic.New(session)
 	params := &ecrpublic.GetAuthorizationTokenInput{}
