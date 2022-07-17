@@ -5,7 +5,6 @@ package docker
 import (
 	"encoding/base64"
 	"fmt"
-	"github.com/aws/aws-sdk-go/service/ecrpublic"
 	"log"
 	"net/http"
 	"net/url"
@@ -16,6 +15,7 @@ import (
 	awsCredentials "github.com/aws/aws-sdk-go/aws/credentials"
 	"github.com/aws/aws-sdk-go/aws/session"
 	"github.com/aws/aws-sdk-go/service/ecr"
+	"github.com/aws/aws-sdk-go/service/ecrpublic"
 	awsbase "github.com/hashicorp/aws-sdk-go-base"
 	"github.com/hashicorp/go-cleanhttp"
 )
