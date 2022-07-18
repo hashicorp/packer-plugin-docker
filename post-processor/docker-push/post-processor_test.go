@@ -32,6 +32,34 @@ func TestPostProcessor_ImplementsPostProcessor(t *testing.T) {
 	var _ packersdk.PostProcessor = new(PostProcessor)
 }
 
+func TestGetEcrType(t *testing.T) {
+	awsConfig := docker.AwsAccessConfig{}
+
+	typ, _ := awsConfig.GetEcrType("https://public.ecr.aws/j9y7g6y8/dev_hc_pkr_dkr_test_1")
+	if typ != docker.Public {
+		msg := fmt.Sprintf("ECR type should be %v", docker.Public)
+		t.Fatal(msg)
+	}
+
+	typ, _ = awsConfig.GetEcrType("https://public.ecr.aws/j9y7g6y8/dev_hc_pkr_dkr_test_1")
+	if typ != docker.Public {
+		msg := fmt.Sprintf("ECR type should be %v", docker.Public)
+		t.Fatal(msg)
+	}
+
+	typ, _ = awsConfig.GetEcrType("https://12345.dkr.ecr.us-east-1.amazonaws.com/private_dev_hc_pkr_dkr_test_1")
+	if typ != docker.Private {
+		msg := fmt.Sprintf("ECR type should be %v", docker.Private)
+		t.Fatal(msg)
+	}
+
+	typ, _ = awsConfig.GetEcrType("google.com")
+	if typ != docker.Invalid {
+		msg := fmt.Sprintf("ECR type should be %v", docker.Invalid)
+		t.Fatal(msg)
+	}
+}
+
 func TestPostProcessor_PostProcess(t *testing.T) {
 	driver := &docker.MockDriver{}
 	p := &PostProcessor{Driver: driver}
