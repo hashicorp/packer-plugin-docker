@@ -88,7 +88,7 @@ func (c *AwsAccessConfig) PublicEcrLogin(ecrUrl string) (string, string, error) 
 	// the config.
 	creds, err := c.GetCredentials(config)
 	if err != nil {
-		return "", "", fmt.Errorf(err.Error())
+		return "", "", err
 	}
 	config.WithCredentials(creds)
 
@@ -119,7 +119,7 @@ func (c *AwsAccessConfig) PublicEcrLogin(ecrUrl string) (string, string, error) 
 
 	resp, err := service.GetAuthorizationToken(params)
 	if err != nil {
-		return "", "", fmt.Errorf(err.Error())
+		return "", "", err
 	}
 
 	auth, err := base64.StdEncoding.DecodeString(*resp.AuthorizationData.AuthorizationToken)
@@ -145,7 +145,7 @@ func (c *AwsAccessConfig) EcrGetLogin(ecrUrl string) (string, string, error) {
 	if parsingErr != nil {
 		errMsg := "failed to parse the ECR URL: %v" +
 			"\n%v" +
-			"\nit should be either on the form `public.ecr.aws/<registry_alias>/<registry_name>` or " +
+			"\nit should be either of the form `public.ecr.aws/<registry_alias>/<registry_name>` or " +
 			"`<account number>.dkr.ecr.<region>.amazonaws.com`"
 		return "", "", fmt.Errorf(errMsg, ecrUrl, parsingErr)
 	}
