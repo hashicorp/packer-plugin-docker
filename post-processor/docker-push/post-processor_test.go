@@ -35,27 +35,39 @@ func TestPostProcessor_ImplementsPostProcessor(t *testing.T) {
 func TestGetEcrType(t *testing.T) {
 	awsConfig := docker.AwsAccessConfig{}
 
+	// Public
 	typ, _ := awsConfig.GetEcrType("https://public.ecr.aws/j9y7g6y8/dev_hc_pkr_dkr_test_1")
 	if typ != docker.Public {
 		msg := fmt.Sprintf("ECR type should be %v", docker.Public)
 		t.Fatal(msg)
 	}
 
-	typ, _ = awsConfig.GetEcrType("https://public.ecr.aws/j9y7g6y8/dev_hc_pkr_dkr_test_1")
+	typ, _ = awsConfig.GetEcrType("public.ecr.aws/j9y7g6y8/dev_hc_pkr_dkr_test_1")
 	if typ != docker.Public {
 		msg := fmt.Sprintf("ECR type should be %v", docker.Public)
 		t.Fatal(msg)
 	}
 
+	// Private
 	typ, _ = awsConfig.GetEcrType("https://12345.dkr.ecr.us-east-1.amazonaws.com/private_dev_hc_pkr_dkr_test_1")
 	if typ != docker.Private {
 		msg := fmt.Sprintf("ECR type should be %v", docker.Private)
 		t.Fatal(msg)
 	}
 
+	typ, _ = awsConfig.GetEcrType("12345.dkr.ecr.us-east-1.amazonaws.com/private_dev_hc_pkr_dkr_test_1")
+	if typ != docker.Private {
+		msg := fmt.Sprintf("ECR type should be %v", docker.Private)
+		t.Fatal(msg)
+	}
+
+	// Known Unknown
 	typ, _ = awsConfig.GetEcrType("google.com")
-	if typ != docker.Invalid {
-		msg := fmt.Sprintf("ECR type should be %v", docker.Invalid)
+	if typ != docker.Private {
+		// This is a known edge case when the user adds a random URL and tries
+		// to authenticate with ECR the AWS SDK would fail. Checking all that
+		// is out of the scope of this function.
+		msg := fmt.Sprintf("ECR type should be %v", docker.Private)
 		t.Fatal(msg)
 	}
 }

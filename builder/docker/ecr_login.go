@@ -57,6 +57,11 @@ const EcrPublicApiRegion = "us-east-1"
 // GetEcrType : Get ECR type (Public or Private) based on the given URL.
 // If the URL can't be parsed the function returns Invalid.
 func (c *AwsAccessConfig) GetEcrType(ecrUrl string) (ECRType, error) {
+	hasHttpsPrefix := strings.HasPrefix(ecrUrl, "https://")
+	if !hasHttpsPrefix {
+		ecrUrl = "https://" + ecrUrl
+	}
+
 	_, err := url.ParseRequestURI(ecrUrl)
 	if err != nil {
 		return Invalid, err
