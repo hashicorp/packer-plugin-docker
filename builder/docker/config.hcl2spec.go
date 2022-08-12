@@ -98,6 +98,7 @@ type FlatConfig struct {
 	SecretKey                 *string           `mapstructure:"aws_secret_key" required:"false" cty:"aws_secret_key" hcl:"aws_secret_key"`
 	Token                     *string           `mapstructure:"aws_token" required:"false" cty:"aws_token" hcl:"aws_token"`
 	Profile                   *string           `mapstructure:"aws_profile" required:"false" cty:"aws_profile" hcl:"aws_profile"`
+	PublicEcrGallery          *bool             `mapstructure:"public_ecr_gallery" required:"false" cty:"public_ecr_gallery" hcl:"public_ecr_gallery"`
 }
 
 // FlatMapstructure returns a new FlatConfig.
@@ -200,6 +201,7 @@ func (*FlatConfig) HCL2Spec() map[string]hcldec.Spec {
 		"aws_secret_key":               &hcldec.AttrSpec{Name: "aws_secret_key", Type: cty.String, Required: false},
 		"aws_token":                    &hcldec.AttrSpec{Name: "aws_token", Type: cty.String, Required: false},
 		"aws_profile":                  &hcldec.AttrSpec{Name: "aws_profile", Type: cty.String, Required: false},
+		"public_ecr_gallery":           &hcldec.AttrSpec{Name: "public_ecr_gallery", Type: cty.Bool, Required: false},
 	}
 	return s
 }
