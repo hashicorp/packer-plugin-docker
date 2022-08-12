@@ -46,7 +46,7 @@ type AwsAccessConfig struct {
 
 type ECRType string
 
-const EcrPublicHost = "public.ecr.aws"
+const EcrPublicHost = "public.ecr.aws/"
 
 // EcrPublicApiRegion : The Amazon ECR Public registry requires authentication in the us-east-1 Region,
 // so you need to specify --region us-east-1 each time you authenticate
@@ -56,7 +56,7 @@ const EcrPublicApiRegion = "us-east-1"
 // LoginServer is the ECR Public URL
 func (c *AwsAccessConfig) SetPublicEcrGallery(ecrUrl string) {
 	forcePushEcr := c.PublicEcrGallery
-	notPublicEcrUrl := !strings.Contains(ecrUrl, "public.ecr.aws/")
+	notPublicEcrUrl := !strings.Contains(ecrUrl, EcrPublicHost)
 	if forcePushEcr || notPublicEcrUrl {
 		return
 	}
