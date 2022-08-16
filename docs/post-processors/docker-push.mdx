@@ -41,7 +41,7 @@ This post-processor has only optional configuration:
   the duration of the push. If true `login_server` is required and `login`,
   `login_username`, and `login_password` will be ignored.
 
-- `public_ecr_gallery` (boolean) - Defaults to false. If true, the
+- `aws_force_use_public_ecr` (boolean) - Defaults to false. If true, the
 post-processor will try to force push the image to ECR Public Gallery. However,
 this flag is optional if you specify the correct ECR Public URL in the
 `login_server`, the post-processor will automatically detect it as ECR Public.

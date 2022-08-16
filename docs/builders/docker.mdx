@@ -613,20 +613,20 @@ and example configuration properties are shown below:
 ```json
     {
         "post-processors": [
-        [
-    {
-        "type": "docker-tag",
-        "repository": "public.ecr.aws/j9y7g6y8/dev_hc_pkr_dkr_test_1",
-        "tags": ["latest"]
-    },
-    {
-        "type": "docker-push",
-        "ecr_login": true,
-        "aws_access_key": "YOUR KEY HERE",
-        "aws_secret_key": "YOUR SECRET KEY HERE",
-        "login_server": "https://public.ecr.aws/j9y7g6y8/dev_hc_pkr_dkr_test_1"
-    }
-        ]
+            [
+                {
+                    "type": "docker-tag",
+                    "repository": "public.ecr.aws/j9y7g6y8/dev_hc_pkr_dkr_test_1",
+                    "tags": ["latest"]
+                },
+                {
+                    "type": "docker-push",
+                    "ecr_login": true,
+                    "aws_access_key": "YOUR KEY HERE",
+                    "aws_secret_key": "YOUR SECRET KEY HERE",
+                    "login_server": "https://public.ecr.aws/j9y7g6y8/dev_hc_pkr_dkr_test_1"
+                }
+            ]
         ]
     }
 ```

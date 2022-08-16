@@ -41,7 +41,7 @@ type AwsAccessConfig struct {
 	// ECR. If the user sets this to `true` from the config, we will forcefully
 	// try to push to Public ECR otherwise set this from code based on the
 	// given LoginServer value
-	PublicEcrGallery bool `mapstructure:"public_ecr_gallery" required:"false"`
+	PublicEcrGallery bool `mapstructure:"aws_force_use_public_ecr" required:"false"`
 }
 
 type ECRType string
