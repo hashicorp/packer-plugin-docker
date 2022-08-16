@@ -13,13 +13,11 @@
   probably don't need it. This will also be read from the AWS_SESSION_TOKEN
   environmental variable.
 
-- `aws_profile` (string) - The AWS shared credentials profile used to
-  communicate with AWS. Learn how to set
-  this.
+- `aws_profile` (string) - The AWS shared credentials profile used to communicate with AWS.
 
 - `aws_force_use_public_ecr` (bool) - The flag to identify whether to push docker image to Public _or_ Private
   ECR. If the user sets this to `true` from the config, we will forcefully
   try to push to Public ECR otherwise set this from code based on the
-  given LoginServer value
+  given LoginServer value.
 
 <!-- End of code generated from the comments of the AwsAccessConfig struct in builder/docker/ecr_login.go; -->

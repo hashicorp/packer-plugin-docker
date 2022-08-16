@@ -33,14 +33,12 @@ type AwsAccessConfig struct {
 	// probably don't need it. This will also be read from the AWS_SESSION_TOKEN
 	// environmental variable.
 	Token string `mapstructure:"aws_token" required:"false"`
-	// The AWS shared credentials profile used to
-	// communicate with AWS. Learn how to set
-	// this.
+	// The AWS shared credentials profile used to communicate with AWS.
 	Profile string `mapstructure:"aws_profile" required:"false"`
 	// The flag to identify whether to push docker image to Public _or_ Private
 	// ECR. If the user sets this to `true` from the config, we will forcefully
 	// try to push to Public ECR otherwise set this from code based on the
-	// given LoginServer value
+	// given LoginServer value.
 	PublicEcrGallery bool `mapstructure:"aws_force_use_public_ecr" required:"false"`
 }
 
