@@ -41,6 +41,11 @@ This post-processor has only optional configuration:
   the duration of the push. If true `login_server` is required and `login`,
   `login_username`, and `login_password` will be ignored.
 
+- `aws_force_use_public_ecr` (boolean) - Defaults to false. If true, the
+post-processor will try to force push the image to ECR Public Gallery. However,
+this flag is optional if you specify the correct ECR Public URL in the
+`login_server`, the post-processor will automatically detect it as ECR Public.
+
 - `keep_input_artifact` (boolean) - if true, do not delete the docker image
   after pushing it to the cloud. Defaults to true, but can be set to false if
   you do not need to save your local copy of the docker container.

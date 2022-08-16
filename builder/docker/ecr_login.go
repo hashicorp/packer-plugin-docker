@@ -7,7 +7,6 @@ import (
 	"fmt"
 	"log"
 	"net/http"
-	"net/url"
 	"regexp"
 	"strings"
 
@@ -38,39 +37,30 @@ type AwsAccessConfig struct {
 	// communicate with AWS. Learn how to set
 	// this.
 	Profile string `mapstructure:"aws_profile" required:"false"`
+	// The flag to identify whether to push docker image to Public _or_ Private
+	// ECR. If the user sets this to `true` from the config, we will forcefully
+	// try to push to Public ECR otherwise set this from code based on the
+	// given LoginServer value
+	PublicEcrGallery bool `mapstructure:"aws_force_use_public_ecr" required:"false"`
 }
 
 type ECRType string
 
-const (
-	Public  ECRType = "public"
-	Private ECRType = "private"
-	Invalid ECRType = "invalid"
-)
-
-const EcrPublicHost = "public.ecr.aws"
+const EcrPublicHost = "public.ecr.aws/"
 
 // EcrPublicApiRegion : The Amazon ECR Public registry requires authentication in the us-east-1 Region,
 // so you need to specify --region us-east-1 each time you authenticate
 const EcrPublicApiRegion = "us-east-1"
 
-// GetEcrType : Get ECR type (Public or Private) based on the given URL.
-// If the URL can't be parsed the function returns Invalid.
-func (c *AwsAccessConfig) GetEcrType(ecrUrl string) (ECRType, error) {
-	_, err := url.ParseRequestURI(ecrUrl)
-	if err != nil {
-		return Invalid, err
+// SetPublicEcrGallery sets PublicEcrGallery flag to `true` if the user given
+// LoginServer is the ECR Public URL
+func (c *AwsAccessConfig) SetPublicEcrGallery(ecrUrl string) {
+	forcePushEcr := c.PublicEcrGallery
+	notPublicEcrUrl := !strings.Contains(ecrUrl, EcrPublicHost)
+	if forcePushEcr || notPublicEcrUrl {
+		return
 	}
-
-	u, err := url.Parse(ecrUrl)
-	if err != nil || u.Scheme == "" || u.Host == "" {
-		return Invalid, err
-	}
-
-	if u.Host == EcrPublicHost {
-		return Public, nil
-	}
-	return Private, nil
+	c.PublicEcrGallery = true
 }
 
 // PublicEcrLogin : Get a login token for Amazon AWS ECR Public. Returns username and password
@@ -140,17 +130,9 @@ func (c *AwsAccessConfig) PublicEcrLogin(ecrUrl string) (string, string, error) 
 // or an error.
 func (c *AwsAccessConfig) EcrGetLogin(ecrUrl string) (string, string, error) {
 
-	// Check ECR Type
-	ecrType, parsingErr := c.GetEcrType(ecrUrl)
-	if parsingErr != nil {
-		errMsg := "failed to parse the ECR URL: %v" +
-			"\n%v" +
-			"\nit should be either of the form `public.ecr.aws/<registry_alias>/<registry_name>` or " +
-			"`<account number>.dkr.ecr.<region>.amazonaws.com`"
-		return "", "", fmt.Errorf(errMsg, ecrUrl, parsingErr)
-	}
-
-	if ecrType == Public {
+	// Check ECR Type and set the flag
+	c.SetPublicEcrGallery(ecrUrl)
+	if c.PublicEcrGallery {
 		return c.PublicEcrLogin(ecrUrl)
 	}
 

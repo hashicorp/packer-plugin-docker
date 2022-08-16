@@ -32,30 +32,54 @@ func TestPostProcessor_ImplementsPostProcessor(t *testing.T) {
 	var _ packersdk.PostProcessor = new(PostProcessor)
 }
 
-func TestGetEcrType(t *testing.T) {
+func TestAwsAccessConfig(t *testing.T) {
 	awsConfig := docker.AwsAccessConfig{}
 
-	typ, _ := awsConfig.GetEcrType("https://public.ecr.aws/j9y7g6y8/dev_hc_pkr_dkr_test_1")
-	if typ != docker.Public {
-		msg := fmt.Sprintf("ECR type should be %v", docker.Public)
+	url := "https://public.ecr.aws/j9y7g6y8/dev_hc_pkr_dkr_test_1"
+	awsConfig.PublicEcrGallery = false
+	awsConfig.SetPublicEcrGallery(url)
+	if awsConfig.PublicEcrGallery == false {
+		msg := fmt.Sprintf("PublicEcrGallery flag should be set to `true` for %v", url)
 		t.Fatal(msg)
 	}
 
-	typ, _ = awsConfig.GetEcrType("https://public.ecr.aws/j9y7g6y8/dev_hc_pkr_dkr_test_1")
-	if typ != docker.Public {
-		msg := fmt.Sprintf("ECR type should be %v", docker.Public)
+	url = "https://746700064644.dkr.ecr.us-east-1.amazonaws.com/private_dev_hc_pkr_dkr_test_1"
+	awsConfig.PublicEcrGallery = false
+	awsConfig.SetPublicEcrGallery(url)
+	if awsConfig.PublicEcrGallery == true {
+		msg := fmt.Sprintf("PublicEcrGallery flag should be set to `false` for %v", url)
 		t.Fatal(msg)
 	}
 
-	typ, _ = awsConfig.GetEcrType("https://12345.dkr.ecr.us-east-1.amazonaws.com/private_dev_hc_pkr_dkr_test_1")
-	if typ != docker.Private {
-		msg := fmt.Sprintf("ECR type should be %v", docker.Private)
+	url = "public.ecr.aws/j9y7g6y8/dev_hc_pkr_dkr_test_1"
+	awsConfig.PublicEcrGallery = false
+	awsConfig.SetPublicEcrGallery(url)
+	if awsConfig.PublicEcrGallery == false {
+		msg := fmt.Sprintf("PublicEcrGallery flag should be set to `true` for %v", url)
 		t.Fatal(msg)
 	}
 
-	typ, _ = awsConfig.GetEcrType("google.com")
-	if typ != docker.Invalid {
-		msg := fmt.Sprintf("ECR type should be %v", docker.Invalid)
+	url = "746700064644.dkr.ecr.us-east-1.amazonaws.com/private_dev_hc_pkr_dkr_test_1"
+	awsConfig.PublicEcrGallery = false
+	awsConfig.SetPublicEcrGallery(url)
+	if awsConfig.PublicEcrGallery == true {
+		msg := fmt.Sprintf("PublicEcrGallery flag should be set to `false` for %v", url)
+		t.Fatal(msg)
+	}
+
+	url = "ghco.com"
+	awsConfig.PublicEcrGallery = true
+	awsConfig.SetPublicEcrGallery(url)
+	if awsConfig.PublicEcrGallery == false {
+		msg := fmt.Sprintf("PublicEcrGallery flag should be set to `true` for %v", url)
+		t.Fatal(msg)
+	}
+
+	url = "ghco.com"
+	awsConfig.PublicEcrGallery = false
+	awsConfig.SetPublicEcrGallery(url)
+	if awsConfig.PublicEcrGallery == true {
+		msg := fmt.Sprintf("PublicEcrGallery flag should be set to `false` for %v", url)
 		t.Fatal(msg)
 	}
 }

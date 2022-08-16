@@ -601,6 +601,57 @@ post-processors {
 </Tab>
 </Tabs>
 
+
+## Amazon ECR Public Gallery
+
+Packer can tag and push images for use in [Amazon ECR Public
+Gallery](https://gallery.ecr.aws/). The post processors work as described above
+and example configuration properties are shown below:
+
+<Tabs>
+<Tab heading="JSON">
+```json
+    {
+        "post-processors": [
+            [
+                {
+                    "type": "docker-tag",
+                    "repository": "public.ecr.aws/j9y7g6y8/dev_hc_pkr_dkr_test_1",
+                    "tags": ["latest"]
+                },
+                {
+                    "type": "docker-push",
+                    "ecr_login": true,
+                    "aws_access_key": "YOUR KEY HERE",
+                    "aws_secret_key": "YOUR SECRET KEY HERE",
+                    "login_server": "https://public.ecr.aws/j9y7g6y8/dev_hc_pkr_dkr_test_1"
+                }
+            ]
+        ]
+    }
+```
+</Tab>
+<Tab heading="HCL2">
+
+```hcl
+    post-processors {
+        post-processor "docker-tag" {
+            repository = "public.ecr.aws/j9y7g6y8/dev_hc_pkr_dkr_test_1"
+            tags       = ["latest"]
+        }
+
+        post-processor "docker-push" {
+            "ecr_login": true,
+            "aws_access_key": "YOUR KEY HERE",
+            "aws_secret_key": "YOUR SECRET KEY HERE",
+            login_server = "public.ecr.aws/j9y7g6y8/dev_hc_pkr_dkr_test_1"
+        }
+    }
+```
+
+</Tab>
+</Tabs>
+
 [Learn how to set Amazon AWS
 credentials.](/docs/builders/amazon#specifying-amazon-credentials)
 
