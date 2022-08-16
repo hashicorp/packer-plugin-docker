@@ -20,13 +20,9 @@ import (
 )
 
 type AwsAccessConfig struct {
-	// The AWS access key used to communicate with
-	// AWS. Learn how to set
-	// this.
+	// The AWS access key used to communicate with AWS.
 	AccessKey string `mapstructure:"aws_access_key" required:"false"`
-	// The AWS secret key used to communicate with
-	// AWS. Learn how to set
-	// this.
+	// The AWS secret key used to communicate with AWS.
 	SecretKey string `mapstructure:"aws_secret_key" required:"false"`
 	// The AWS access token to use. This is different from
 	// the access key and secret key. If you're not sure what this is, then you
