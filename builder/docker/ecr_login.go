@@ -20,27 +20,21 @@ import (
 )
 
 type AwsAccessConfig struct {
-	// The AWS access key used to communicate with
-	// AWS. Learn how to set
-	// this.
+	// The AWS access key used to communicate with AWS.
 	AccessKey string `mapstructure:"aws_access_key" required:"false"`
-	// The AWS secret key used to communicate with
-	// AWS. Learn how to set
-	// this.
+	// The AWS secret key used to communicate with AWS.
 	SecretKey string `mapstructure:"aws_secret_key" required:"false"`
 	// The AWS access token to use. This is different from
 	// the access key and secret key. If you're not sure what this is, then you
 	// probably don't need it. This will also be read from the AWS_SESSION_TOKEN
 	// environmental variable.
 	Token string `mapstructure:"aws_token" required:"false"`
-	// The AWS shared credentials profile used to
-	// communicate with AWS. Learn how to set
-	// this.
+	// The AWS shared credentials profile used to communicate with AWS.
 	Profile string `mapstructure:"aws_profile" required:"false"`
 	// The flag to identify whether to push docker image to Public _or_ Private
 	// ECR. If the user sets this to `true` from the config, we will forcefully
 	// try to push to Public ECR otherwise set this from code based on the
-	// given LoginServer value
+	// given LoginServer value.
 	PublicEcrGallery bool `mapstructure:"aws_force_use_public_ecr" required:"false"`
 }
 
