@@ -643,9 +643,9 @@ and example configuration properties are shown below:
         }
 
         post-processor "docker-push" {
-            "ecr_login": true,
-            "aws_access_key": "YOUR KEY HERE",
-            "aws_secret_key": "YOUR SECRET KEY HERE",
+            ecr_login = true
+            aws_access_key = "YOUR KEY HERE"
+            aws_secret_key = "YOUR SECRET KEY HERE"
             login_server = "public.ecr.aws/YOUR REGISTRY ALIAS HERE"
         }
     }
