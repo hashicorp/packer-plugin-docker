@@ -138,7 +138,7 @@ func (c *AwsAccessConfig) EcrGetLogin(ecrUrl string) (string, string, error) {
 	accountId := splitUrl[1]
 	region := splitUrl[2]
 
-	log.Println(fmt.Sprintf("Getting ECR token for account: %s in %s..", accountId, region))
+	log.Printf("Getting ECR token for account: %s in %s..", accountId, region)
 
 	// Create new AWS config
 	config := aws.NewConfig().WithCredentialsChainVerboseErrors(true)
