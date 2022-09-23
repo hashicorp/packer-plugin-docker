@@ -93,9 +93,6 @@ func TestPostProcessor_PostProcess(t *testing.T) {
 	}
 
 	result, keep, forceOverride, err := p.PostProcess(context.Background(), testUi(), artifact)
-	if _, ok := result.(packersdk.Artifact); !ok {
-		t.Fatal("should be instance of Artifact")
-	}
 	if !keep {
 		t.Fatal("should keep")
 	}
@@ -126,9 +123,6 @@ func TestPostProcessor_PostProcess_portInName(t *testing.T) {
 	}
 
 	result, keep, forceOverride, err := p.PostProcess(context.Background(), testUi(), artifact)
-	if _, ok := result.(packersdk.Artifact); !ok {
-		t.Fatal("should be instance of Artifact")
-	}
 	if !keep {
 		t.Fatal("should keep")
 	}
@@ -159,9 +153,6 @@ func TestPostProcessor_PostProcess_tags(t *testing.T) {
 	}
 
 	result, keep, forceOverride, err := p.PostProcess(context.Background(), testUi(), artifact)
-	if _, ok := result.(packersdk.Artifact); !ok {
-		t.Fatal("should be instance of Artifact")
-	}
 	if !keep {
 		t.Fatal("should keep")
 	}
@@ -196,9 +187,6 @@ func TestPostProcessor_PostProcess_digestWarning(t *testing.T) {
 	testUi := testUi()
 	result, keep, forceOverride, err := p.PostProcess(context.Background(), testUi, artifact)
 	resultString := readWriter(testUi)
-	if _, ok := result.(packersdk.Artifact); !ok {
-		t.Fatal("should be instance of Artifact")
-	}
 	if !keep {
 		t.Fatal("should keep")
 	}
