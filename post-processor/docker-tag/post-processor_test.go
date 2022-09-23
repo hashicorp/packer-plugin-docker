@@ -41,10 +41,7 @@ func TestPostProcessor_PostProcess(t *testing.T) {
 		IdValue:        "1234567890abcdef",
 	}
 
-	result, keep, forceOverride, err := p.PostProcess(context.Background(), testUi(), artifact)
-	if _, ok := result.(packersdk.Artifact); !ok {
-		t.Fatal("should be instance of Artifact")
-	}
+	_, keep, forceOverride, err := p.PostProcess(context.Background(), testUi(), artifact)
 	if !keep {
 		t.Fatal("should keep")
 	}
@@ -89,10 +86,7 @@ func TestPostProcessor_PostProcess_Force(t *testing.T) {
 		IdValue:        "1234567890abcdef",
 	}
 
-	result, keep, forceOverride, err := p.PostProcess(context.Background(), testUi(), artifact)
-	if _, ok := result.(packersdk.Artifact); !ok {
-		t.Fatal("should be instance of Artifact")
-	}
+	_, keep, forceOverride, err := p.PostProcess(context.Background(), testUi(), artifact)
 	if !keep {
 		t.Fatal("should keep")
 	}
@@ -131,10 +125,7 @@ func TestPostProcessor_PostProcess_NoTag(t *testing.T) {
 
 	artifact := &packersdk.MockArtifact{BuilderIdValue: dockerimport.BuilderId, IdValue: "1234567890abcdef"}
 
-	result, keep, forceOverride, err := p.PostProcess(context.Background(), testUi(), artifact)
-	if _, ok := result.(packersdk.Artifact); !ok {
-		t.Fatal("should be instance of Artifact")
-	}
+	_, keep, forceOverride, err := p.PostProcess(context.Background(), testUi(), artifact)
 	if !keep {
 		t.Fatal("should keep")
 	}
