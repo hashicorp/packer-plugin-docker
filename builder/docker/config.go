@@ -37,7 +37,7 @@ type Config struct {
 	// set to `true` or an `export_path` must be provided.
 	Commit bool `mapstructure:"commit" required:"true"`
 	// The directory inside container to mount temp directory from host server
-	// for work [file provisioner](/docs/provisioners/file). This defaults
+	// for work [file provisioner](/packer/docs/provisioners/file). This defaults
 	// to c:/packer-files on windows and /packer-files on other systems.
 	ContainerDir string `mapstructure:"container_dir" required:"false"`
 	// An array of devices which will be accessible in container when it's run
@@ -45,7 +45,7 @@ type Config struct {
 	Device []string `mapstructure:"device" required:"false"`
 	// Throw away the container when the build is complete. This is useful for
 	// the [artifice
-	// post-processor](/docs/post-processors/artifice).
+	// post-processor](/packer/docs/post-processors/artifice).
 	Discard bool `mapstructure:"discard" required:"true"`
 	// An array of additional [Linux
 	// capabilities](https://docs.docker.com/engine/reference/run/#runtime-privilege-and-linux-capabilities)
