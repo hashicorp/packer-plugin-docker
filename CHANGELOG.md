@@ -1,6 +1,6 @@
 # Latest Release
 
-Please refer to [releases](https://github.com/hashicorp/packer-plugin-vsphere/releases) for the latest CHANGELOG information.
+Please refer to [releases](https://github.com/hashicorp/packer-plugin-docker/releases) for the latest CHANGELOG information.
 
 ---
 ## 1.0.3 (October 29, 2021)
