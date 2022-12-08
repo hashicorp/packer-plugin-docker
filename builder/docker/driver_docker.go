@@ -7,6 +7,7 @@ import (
 	"log"
 	"os"
 	"os/exec"
+ 	"path/filepath"
 	"regexp"
 	"strings"
 	"sync"
@@ -350,6 +351,10 @@ func (d *DockerDriver) StartContainer(config *ContainerConfig) (string, error) {
 		args = append(args, "--tmpfs", v)
 	}
 	for host, guest := range config.Volumes {
+		if strings.HasPrefix(host, "~/") {
+			homedir, _ := os.UserHomeDir()
+			host = filepath.Join(homedir, host[2:])
+		}
 		args = append(args, "-v", fmt.Sprintf("%s:%s", host, guest))
 	}
 	for _, v := range config.RunCommand {
