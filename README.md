@@ -54,10 +54,6 @@ documentation located in the [`docs/`](docs) directory.
 
 ## Contributing
 
-* If you think you've found a bug in the code or you have a question regarding
-  the usage of this software, please reach out to us by opening an issue in
-  this GitHub repository.
-* Contributions to this project are welcome: if you want to add a feature or a
-  fix a bug, please do so by opening a Pull Request in this GitHub repository.
-  In case of feature contribution, we kindly ask you to open an issue to
-  discuss it beforehand.
+See
+[CONTRIBUTING.md](https://github.com/hashicorp/packer-plugin-docker/blob/master/.github/CONTRIBUTING.md)
+for best practices and instructions on contributing to Docker Plugin.
