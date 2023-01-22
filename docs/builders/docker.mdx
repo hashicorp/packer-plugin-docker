@@ -128,7 +128,7 @@ from ubuntu as an simple example:
     "LABEL version=1.0",
     "ONBUILD RUN date",
     "CMD [\"nginx\", \"-g\", \"daemon off;\"]",
-    "ENTRYPOINT /var/www/start.sh"
+    "ENTRYPOINT [\"/docker-entrypoint.sh\"]"
   ]
 }
 ```
@@ -149,7 +149,7 @@ source "docker" "example" {
       "LABEL version=1.0",
       "ONBUILD RUN date",
       "CMD [\"nginx\", \"-g\", \"daemon off;\"]",
-      "ENTRYPOINT /var/www/start.sh"
+      "ENTRYPOINT [\"/docker-entrypoint.sh\"]"
     ]
 }
 ```
