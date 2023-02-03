@@ -121,13 +121,6 @@ func (p *PostProcessor) PostProcess(ctx context.Context, ui packersdk.Ui, artifa
 			return nil, false, false, fmt.Errorf(
 				"Error logging in to Docker: %s", err)
 		}
-
-		defer func() {
-			ui.Message("Logging out...")
-			if err := driver.Logout(p.config.LoginServer); err != nil {
-				ui.Error(fmt.Sprintf("Error logging out: %s", err))
-			}
-		}()
 	}
 
 	var tags []string
