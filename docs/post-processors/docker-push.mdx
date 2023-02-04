@@ -54,6 +54,13 @@ this flag is optional if you specify the correct ECR Public URL in the
 
 - `login` (boolean) - Defaults to false. If true, the post-processor will
   login prior to pushing. For log into ECR see `ecr_login`.
+  Note that a corresponding `logout` will be performed right after the push.
+  This may conflict with other parallel post-processor instances that also
+  perform login/logout (e.g. if you're building and pushing several images
+  in parallel).
+  In that case, it's better to keep `login` set to `false` and have
+  the `docker login` and `docker logout` performed out of band, separately
+  from Packer.
 
 - `login_username` (string) - The username to use to authenticate to login.
 
