@@ -67,7 +67,7 @@ jobs:
                    "labels": ${{ steps.set-ticket-labels.outputs.labels }} }'
       - name: Add tracking comment
         if: steps.create-ticket.outputs.issue != '' && steps.set-ticket-type.outputs.type != 'Invalid'
-        uses: actions-ecosystem/action-create-comment@e23bc59fbff7aac7f9044bd66c2dc0fe1286f80b # v1.0.2
+        uses: actions-ecosystem/action-create-comment@e23bc59fbff7aac7f9044bd66c2dc0fe1286f80b  # TSCCR: no entry for repository "actions-ecosystem/action-create-comment"
         with:
           github_token: ${{ secrets.GITHUB_TOKEN }}
           body: |
