@@ -536,7 +536,7 @@ container.
 
 ```hcl
 source "docker" "windows" {
-    image = "ubuntu"
+    image = "microsoft/windowsservercore:1709"
     container_dir = "c:/app"
     windows_container = true
     commit = true
