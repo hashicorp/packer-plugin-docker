@@ -1,14 +1,3 @@
----
-description: >
-  The docker Packer builder builds Docker images using Docker. The builder
-  starts a Docker container, runs provisioners within this container, then exports the
-container for reuse or commits the image.
-page_title: Docker - Builders
-nav_title: Docker
----
-
-# Docker Builder
-
 Type: `docker`
 
 The `docker` Packer builder builds [Docker](https://www.docker.io) images using
@@ -192,7 +181,7 @@ You must specify (only) one of `commit`, `discard`, or `export_path`.
 
 - `discard` (bool) - Throw away the container when the build is complete. This is useful for
   the [artifice
-  post-processor](/packer/docs/post-processors/artifice).
+  post-processor](/packer/docs/post-processor/artifice).
 
 - `export_path` (string) - The path where the final container will be exported as a tar file.
 
@@ -204,10 +193,10 @@ You must specify (only) one of `commit`, `discard`, or `export_path`.
 ### Optional:
 
 - `aws_access_key` (string) - The AWS access key used to communicate with
-  AWS. [Learn how to set this.](/packer/plugins/builders/amazon#specifying-amazon-credentials) 
+  AWS. [Learn how to set this.](/packer/integrations/hashicorp/amazon#specifying-amazon-credentials) 
 
 - `aws_secret_key` (string) - The AWS secret key used to communicate with
-  AWS. [Learn how to set this.](/packer/plugins/builders/amazon#specifying-amazon-credentials)
+  AWS. [Learn how to set this.](/packer/integrations/hashicorp/amazon#specifying-amazon-credentials)
 
 - `aws_token` (string) - The AWS access token to use. This is different from
   the access key and secret key. If you're not sure what this is, then you
@@ -215,7 +204,7 @@ You must specify (only) one of `commit`, `discard`, or `export_path`.
   environmental variable.
 
 - `aws_profile` (string) - The AWS shared credentials profile used to
-  communicate with AWS. [Learn how to set this.](/packer/plugins/builders/amazon#specifying-amazon-credentials)
+  communicate with AWS. [Learn how to set this.](/packer/integrations/hashicorp/amazon#specifying-amazon-credentials)
 
 - `author` (string) - Set the author (e-mail) of a commit.
 
@@ -224,7 +213,7 @@ You must specify (only) one of `commit`, `discard`, or `export_path`.
   /app", "EXPOSE 8080" ]
 
 - `container_dir` (string) - The directory inside container to mount temp directory from host server
-  for work [file provisioner](/packer/docs/provisioners/file). This defaults
+  for work [file provisioner](/packer/docs/provisioner/file). This defaults
   to c:/packer-files on windows and /packer-files on other systems.
 
 - `device` ([]string) - An array of devices which will be accessible in container when it's run
@@ -306,8 +295,8 @@ The generated variable available for this builder is:
 
 Once the tar artifact has been generated, you will likely want to import, tag,
 and push it to a container repository. Packer can do this for you automatically
-with the [docker-import](/packer/plugins/post-processors/docker/docker-import) and
-[docker-push](/packer/plugins/post-processors/docker/docker-push) post-processors.
+with the [docker-import](/packer/integrations/hashicorp/docker/latest/components/post-processor/docker-import) and
+[docker-push](/packer/integrations/hashicorp/docker/latest/components/post-processor/docker-push) post-processors.
 
 **Note:** This section is covering how to use an artifact that has been
 _exported_. More specifically, if you set `export_path` in your configuration.
@@ -603,7 +592,7 @@ and example configuration properties are shown below:
     }
 ```
 
-[Learn how to set Amazon AWS credentials.](/packer/plugins/builders/amazon#specifying-amazon-credentials)
+[Learn how to set Amazon AWS credentials.](/packer/integrations/hashicorp/amazon#specifying-amazon-credentials)
 
 ## Dockerfiles
 

@@ -1,0 +1,69 @@
+Type: `docker-push`
+
+The Packer Docker push post-processor takes an artifact from the
+[docker-import](/packer/integrations/hashicorp/docker/latest/components/post-processor/docker-import) post-processor and
+pushes it to a Docker registry.
+
+## Configuration
+
+This post-processor has only optional configuration:
+
+- `aws_access_key` (string) - The AWS access key used to communicate with
+  AWS. [Learn how to set this.](/packer/integrations/hashicorp/amazon#specifying-amazon-credentials)
+
+- `aws_secret_key` (string) - The AWS secret key used to communicate with
+  AWS. [Learn how to set this.](/packer/integrations/hashicorp/amazon#specifying-amazon-credentials)
+
+- `aws_token` (string) - The AWS access token to use. This is different from
+  the access key and secret key. If you're not sure what this is, then you
+  probably don't need it. This will also be read from the `AWS_SESSION_TOKEN`
+  environmental variable.
+
+- `aws_profile` (string) - The AWS shared credentials profile used to
+  communicate with AWS. [Learn how to set this.](/packer/integrations/hashicorp/amazon#specifying-amazon-credentials)
+
+- `ecr_login` (boolean) - Defaults to false. If true, the post-processor will
+  login in order to push the image to [Amazon EC2 Container Registry
+  (ECR)](https://aws.amazon.com/ecr/). The post-processor only logs in for
+  the duration of the push. If true `login_server` is required and `login`,
+  `login_username`, and `login_password` will be ignored.
+
+- `aws_force_use_public_ecr` (boolean) - Defaults to false. If true, the
+post-processor will try to force push the image to ECR Public Gallery. However,
+this flag is optional if you specify the correct ECR Public URL in the
+`login_server`, the post-processor will automatically detect it as ECR Public.
+
+- `keep_input_artifact` (boolean) - if true, do not delete the docker image
+  after pushing it to the cloud. Defaults to true, but can be set to false if
+  you do not need to save your local copy of the docker container.
+
+- `platform` (string) - Set platform if server is multi-platform capable.
+
+- `login` (boolean) - Defaults to false. If true, the post-processor will
+  login prior to pushing. For log into ECR see `ecr_login`.
+  Note that a corresponding `logout` will be performed right after the push.
+  This may conflict with other parallel post-processor instances that also
+  perform login/logout (e.g. if you're building and pushing several images
+  in parallel).
+  In that case, it's better to keep `login` set to `false` and have
+  the `docker login` and `docker logout` performed out of band, separately
+  from Packer.
+
+- `login_username` (string) - The username to use to authenticate to login.
+
+- `login_password` (string) - The password to use to authenticate to login.
+
+- `login_server` (string) - The server address to login to.
+
+-> **Note:** When using _Docker Hub_ or _Quay_ registry servers, `login`
+must to be set to `true` and `login_username`, **and** `login_password` must to
+be set to your registry credentials. When using Docker Hub, `login_server` can
+be omitted.
+
+-> **Note:** If you login using the credentials above, the post-processor
+will automatically log you out afterwards (just the server specified).
+
+## Example
+
+For an example of using docker-push, see the section on using generated
+artifacts from the [docker builder](/packer/integrations/hashicorp/docker).
