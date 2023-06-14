@@ -1,23 +1,7 @@
----
-description: >
-  The Packer Docker Save post-processor takes an artifact from the docker
-  builder
-
-  that was committed and saves it to a file. This is similar to exporting the
-
-  Docker image directly from the builder, except that it preserves the hierarchy
-
-  of images and metadata.
-page_title: Docker Save - Post-Processors
-nav_title: Docker Save
----
-
-# Docker Save Post-Processor
-
 Type: `docker-save`
 
 The Packer Docker Save post-processor takes an artifact from the [docker
-builder](/packer/plugins/builders/docker) that was committed and saves it to a file.
+builder](/packer/integrations/hashicorp/docker) that was committed and saves it to a file.
 This is similar to exporting the Docker image directly from the builder, except
 that it preserves the hierarchy of images and metadata.
 
@@ -58,4 +42,3 @@ post-processor "docker-save" {
   path = "foo.tar"
 }
 ```
-
