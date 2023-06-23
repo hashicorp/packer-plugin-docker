@@ -50,6 +50,15 @@ settings are optional.
 An example is shown below, showing only the post-processor configuration:
 
 <Tabs>
+<Tab heading="HCL2">
+
+```hcl
+post-processor "docker-tag" {
+  repository = "hashicorp/packer"
+  tags = ["0.7", "anothertag"]
+}
+```
+</Tab>
 <Tab heading="JSON">
 
 ```json
@@ -57,16 +66,6 @@ An example is shown below, showing only the post-processor configuration:
   "type": "docker-tag",
   "repository": "hashicorp/packer",
   "tags": ["0.7", "anothertag"]
-}
-```
-</Tab>
-
-<Tab heading="HCL2">
-
-```hcl
-post-processor "docker-tag" {
-  repository = "hashicorp/packer"
-  tags = ["0.7", "anothertag"]
 }
 ```
 </Tab>
