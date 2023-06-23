@@ -43,8 +43,8 @@ provisioners are defined, but it will effectively repackage an image.
 
 ```hcl
 source "docker" "example" {
-    image = "ubuntu"
-    export_path = "image.tar"
+  image = "ubuntu"
+  export_path = "image.tar"
 }
 
 build {
@@ -77,8 +77,8 @@ then be more easily tagged, pushed, etc.
 
 ```hcl
 source "docker" "example" {
-    image = "ubuntu"
-    commit = true
+  image = "ubuntu"
+  commit = true
 }
 
 build {
@@ -116,19 +116,19 @@ from ubuntu as an simple example:
 
 ```hcl
 source "docker" "example" {
-    image = "ubuntu"
-    commit = true
-      changes = [
-      "USER www-data",
-      "WORKDIR /var/www",
-      "ENV HOSTNAME www.example.com",
-      "VOLUME /test1 /test2",
-      "EXPOSE 80 443",
-      "LABEL version=1.0",
-      "ONBUILD RUN date",
-      "CMD [\"nginx\", \"-g\", \"daemon off;\"]",
-      "ENTRYPOINT /var/www/start.sh"
-    ]
+  image = "ubuntu"
+  commit = true
+  changes = [
+    "USER www-data",
+    "WORKDIR /var/www",
+    "ENV HOSTNAME www.example.com",
+    "VOLUME /test1 /test2",
+    "EXPOSE 80 443",
+    "LABEL version=1.0",
+    "ONBUILD RUN date",
+    "CMD [\"nginx\", \"-g\", \"daemon off;\"]",
+    "ENTRYPOINT /var/www/start.sh"
+  ]
 }
 ```
 
@@ -345,9 +345,9 @@ of post-processors that are treated as as single pipeline, see
 ```hcl
   post-processors {
     post-processor "docker-import" {
-        repository =  "myrepo/myimage"
-        tag = "0.7"
-      }
+      repository =  "myrepo/myimage"
+      tag = "0.7"
+    }
     post-processor "docker-push" {}
   }
 }
@@ -407,9 +407,9 @@ information):
 ```hcl
   post-processors {
     post-processor "docker-tag" {
-        repository =  "myrepo/myimage"
-        tags = ["0.7"]
-      }
+      repository =  "myrepo/myimage"
+      tags = ["0.7"]
+    }
     post-processor "docker-push" {}
   }
 }
@@ -455,16 +455,16 @@ nearly-identical sequence definitions, as demonstrated by the example below:
 ```hcl
   post-processors {
     post-processor "docker-tag" {
-        repository =  "myrepo/myimage1"
-        tags = ["0.7"]
-      }
+      repository =  "myrepo/myimage1"
+      tags = ["0.7"]
+    }
     post-processor "docker-push" {}
   }
   post-processors {
     post-processor "docker-tag" {
-        repository =  "myrepo/myimage2"
-        tags = ["0.7"]
-      }
+      repository =  "myrepo/myimage2"
+      tags = ["0.7"]
+    }
     post-processor "docker-push" {}
   }
 }
@@ -519,10 +519,10 @@ container.
 
 ```hcl
 source "docker" "windows" {
-    image = "microsoft/windowsservercore:1709"
-    container_dir = "c:/app"
-    windows_container = true
-    commit = true
+  image = "microsoft/windowsservercore:1709"
+  container_dir = "c:/app"
+  windows_container = true
+  commit = true
 }
 
 build {
@@ -562,14 +562,14 @@ above and example configuration properties are shown below:
 ```hcl
 post-processors {
   post-processor "docker-tag" {
-      repository = "12345.dkr.ecr.us-east-1.amazonaws.com/packer"
-      tags = ["0.7"]
+    repository = "12345.dkr.ecr.us-east-1.amazonaws.com/packer"
+    tags = ["0.7"]
   }
   post-processor "docker-push" {
-      ecr_login = true
-      aws_access_key = "YOUR KEY HERE"
-      aws_secret_key = "YOUR SECRET KEY HERE"
-      login_server = "12345.dkr.ecr.us-east-1.amazonaws.com"
+    ecr_login = true
+    aws_access_key = "YOUR KEY HERE"
+    aws_secret_key = "YOUR SECRET KEY HERE"
+    login_server = "12345.dkr.ecr.us-east-1.amazonaws.com"
   }
 }
 ```
@@ -612,19 +612,19 @@ and example configuration properties are shown below:
 <Tab heading="HCL2">
 
 ```hcl
-    post-processors {
-        post-processor "docker-tag" {
-            repository = "public.ecr.aws/YOUR REGISTRY ALIAS HERE/YOUR REGISTRY NAME HERE"
-            tags       = ["latest"]
-        }
+post-processors {
+  post-processor "docker-tag" {
+    repository = "public.ecr.aws/YOUR REGISTRY ALIAS HERE/YOUR REGISTRY NAME HERE"
+    tags       = ["latest"]
+  }
 
-        post-processor "docker-push" {
+  post-processor "docker-push" {
     ecr_login = true
     aws_access_key = "YOUR KEY HERE"
     aws_secret_key = "YOUR SECRET KEY HERE"
-            login_server = "public.ecr.aws/YOUR REGISTRY ALIAS HERE"
-        }
-    }
+    login_server = "public.ecr.aws/YOUR REGISTRY ALIAS HERE"
+  }
+}
 ```
 
 </Tab>
