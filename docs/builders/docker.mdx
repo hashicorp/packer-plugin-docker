@@ -39,17 +39,6 @@ Below is a fully functioning example. It doesn't do anything useful, since no
 provisioners are defined, but it will effectively repackage an image.
 
 <Tabs>
-<Tab heading="JSON">
-
-```json
-{
-  "type": "docker",
-  "image": "ubuntu",
-  "export_path": "image.tar"
-}
-```
-
-</Tab>
 <Tab heading="HCL2">
 
 ```hcl
@@ -60,6 +49,17 @@ source "docker" "example" {
 
 build {
   sources = ["source.docker.example"]
+}
+```
+
+</Tab>
+<Tab heading="JSON">
+
+```json
+{
+  "type": "docker",
+  "image": "ubuntu",
+  "export_path": "image.tar"
 }
 ```
 
@@ -112,6 +112,27 @@ Example uses of all of the options, assuming one is building an NGINX image
 from ubuntu as an simple example:
 
 <Tabs>
+<Tab heading="HCL2">
+
+```hcl
+source "docker" "example" {
+    image = "ubuntu"
+    commit = true
+      changes = [
+      "USER www-data",
+      "WORKDIR /var/www",
+      "ENV HOSTNAME www.example.com",
+      "VOLUME /test1 /test2",
+      "EXPOSE 80 443",
+      "LABEL version=1.0",
+      "ONBUILD RUN date",
+      "CMD [\"nginx\", \"-g\", \"daemon off;\"]",
+      "ENTRYPOINT /var/www/start.sh"
+    ]
+}
+```
+
+</Tab>
 <Tab heading="JSON">
 
 ```json
@@ -130,27 +151,6 @@ from ubuntu as an simple example:
     "CMD [\"nginx\", \"-g\", \"daemon off;\"]",
     "ENTRYPOINT /var/www/start.sh"
   ]
-}
-```
-
-</Tab>
-<Tab heading="HCL2">
-
-```hcl
-source "docker" "example" {
-    image = "ubuntu"
-    commit = true
-      changes = [
-      "USER www-data",
-      "WORKDIR /var/www",
-      "ENV HOSTNAME www.example.com",
-      "VOLUME /test1 /test2",
-      "EXPOSE 80 443",
-      "LABEL version=1.0",
-      "ONBUILD RUN date",
-      "CMD [\"nginx\", \"-g\", \"daemon off;\"]",
-      "ENTRYPOINT /var/www/start.sh"
-    ]
 }
 ```
 
@@ -340,6 +340,20 @@ of post-processors that are treated as as single pipeline, see
 [Post-Processors](/packer/docs/templates/legacy_json_templates/post-processors) for more information):
 
 <Tabs>
+<Tab heading="HCL2">
+
+```hcl
+  post-processors {
+    post-processor "docker-import" {
+        repository =  "myrepo/myimage"
+        tag = "0.7"
+      }
+    post-processor "docker-push" {}
+  }
+}
+```
+
+</Tab>
 <Tab heading="JSON">
 
 ```json
@@ -356,20 +370,6 @@ of post-processors that are treated as as single pipeline, see
       }
     ]
   ]
-}
-```
-
-</Tab>
-<Tab heading="HCL2">
-
-```hcl
-  post-processors {
-    post-processor "docker-import" {
-        repository =  "myrepo/myimage"
-        tag = "0.7"
-      }
-    post-processor "docker-push" {}
-  }
 }
 ```
 
@@ -402,6 +402,20 @@ pipeline, see [Post-Processors](/packer/docs/templates/legacy_json_templates/pos
 information):
 
 <Tabs>
+<Tab heading="HCL2">
+
+```hcl
+  post-processors {
+    post-processor "docker-tag" {
+        repository =  "myrepo/myimage"
+        tags = ["0.7"]
+      }
+    post-processor "docker-push" {}
+  }
+}
+```
+
+</Tab>
 <Tab heading="JSON">
 
 ```json
@@ -422,20 +436,6 @@ information):
 ```
 
 </Tab>
-<Tab heading="HCL2">
-
-```hcl
-  post-processors {
-    post-processor "docker-tag" {
-        repository =  "myrepo/myimage"
-        tags = ["0.7"]
-      }
-    post-processor "docker-push" {}
-  }
-}
-```
-
-</Tab>
 </Tabs>
 
 In the above example, the result of each builder is passed through the defined
@@ -450,6 +450,27 @@ container repositories, this could be accomplished by defining two,
 nearly-identical sequence definitions, as demonstrated by the example below:
 
 <Tabs>
+<Tab heading="HCL2">
+
+```hcl
+  post-processors {
+    post-processor "docker-tag" {
+        repository =  "myrepo/myimage1"
+        tags = ["0.7"]
+      }
+    post-processor "docker-push" {}
+  }
+  post-processors {
+    post-processor "docker-tag" {
+        repository =  "myrepo/myimage2"
+        tags = ["0.7"]
+      }
+    post-processor "docker-push" {}
+  }
+}
+```
+
+</Tab>
 <Tab heading="JSON">
 
 ```json
@@ -476,27 +497,6 @@ nearly-identical sequence definitions, as demonstrated by the example below:
 ```
 
 </Tab>
-<Tab heading="HCL2">
-
-```hcl
-  post-processors {
-    post-processor "docker-tag" {
-        repository =  "myrepo/myimage1"
-        tags = ["0.7"]
-      }
-    post-processor "docker-push" {}
-  }
-  post-processors {
-    post-processor "docker-tag" {
-        repository =  "myrepo/myimage2"
-        tags = ["0.7"]
-      }
-    post-processor "docker-push" {}
-  }
-}
-```
-
-</Tab>
 </Tabs>
 
 <span id="amazon-ec2-container-registry"></span>
@@ -515,6 +515,22 @@ The following is a fully functional template for building a Windows
 container.
 
 <Tabs>
+<Tab heading="HCL2">
+
+```hcl
+source "docker" "windows" {
+    image = "microsoft/windowsservercore:1709"
+    container_dir = "c:/app"
+    windows_container = true
+    commit = true
+}
+
+build {
+  sources = ["source.docker.example"]
+}
+```
+
+</Tab>
 <Tab heading="JSON">
 
 ```json
@@ -528,22 +544,6 @@ container.
       "commit": true
     }
   ]
-}
-```
-
-</Tab>
-<Tab heading="HCL2">
-
-```hcl
-source "docker" "windows" {
-    image = "microsoft/windowsservercore:1709"
-    container_dir = "c:/app"
-    windows_container = true
-    commit = true
-}
-
-build {
-  sources = ["source.docker.example"]
 }
 ```
 
@@ -609,6 +609,25 @@ Gallery](https://gallery.ecr.aws/). The post processors work as described above
 and example configuration properties are shown below:
 
 <Tabs>
+<Tab heading="HCL2">
+
+```hcl
+    post-processors {
+        post-processor "docker-tag" {
+            repository = "public.ecr.aws/YOUR REGISTRY ALIAS HERE/YOUR REGISTRY NAME HERE"
+            tags       = ["latest"]
+        }
+
+        post-processor "docker-push" {
+            "ecr_login": true,
+            "aws_access_key": "YOUR KEY HERE",
+            "aws_secret_key": "YOUR SECRET KEY HERE",
+            login_server = "public.ecr.aws/YOUR REGISTRY ALIAS HERE"
+        }
+    }
+```
+
+</Tab>
 <Tab heading="JSON">
 
 ```json
@@ -629,25 +648,6 @@ and example configuration properties are shown below:
                 }
             ]
         ]
-    }
-```
-
-</Tab>
-<Tab heading="HCL2">
-
-```hcl
-    post-processors {
-        post-processor "docker-tag" {
-            repository = "public.ecr.aws/YOUR REGISTRY ALIAS HERE/YOUR REGISTRY NAME HERE"
-            tags       = ["latest"]
-        }
-
-        post-processor "docker-push" {
-            "ecr_login": true,
-            "aws_access_key": "YOUR KEY HERE",
-            "aws_secret_key": "YOUR SECRET KEY HERE",
-            login_server = "public.ecr.aws/YOUR REGISTRY ALIAS HERE"
-        }
     }
 ```
 

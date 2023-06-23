@@ -22,6 +22,27 @@ registry.
 ## Basic Example
 
 <Tabs>
+<Tab heading="HCL2">
+
+```hcl
+source "docker" "example" {
+    image = "ubuntu:18.04"
+    export_path = "party_parrot.tar"
+}
+
+build {
+  sources = [
+    "source.docker.example"
+  ]
+
+  post-processor "docker-import" {
+    repository = "local/ubuntu"
+    tag = "latest"
+  }
+}
+```
+
+</Tab>
 <Tab heading="JSON">
 
 ```json
@@ -40,27 +61,6 @@ registry.
       "tag": "latest"
     }
   ]
-}
-```
-
-</Tab>
-<Tab heading="HCL2">
-
-```hcl
-source "docker" "example" {
-    image = "ubuntu:18.04"
-    export_path = "party_parrot.tar"
-}
-
-build {
-  sources = [
-    "source.docker.example"
-  ]
-
-  post-processor "docker-import" {
-    repository = "local/ubuntu"
-    tag = "latest"
-  }
 }
 ```
 
@@ -95,6 +95,16 @@ is optional.
 An example is shown below, showing only the post-processor configuration:
 
 <Tabs>
+<Tab heading="HCL2">
+
+```hcl
+post-processor "docker-import" {
+  repository = "hashicorp/packer"
+  tag = "0.7"
+}
+```
+
+</Tab>
 <Tab heading="JSON">
 
 ```json
@@ -102,16 +112,6 @@ An example is shown below, showing only the post-processor configuration:
   "type": "docker-import",
   "repository": "hashicorp/packer",
   "tag": "0.7"
-}
-```
-
-</Tab>
-<Tab heading="HCL2">
-
-```hcl
-post-processor "docker-import" {
-  repository = "hashicorp/packer"
-  tag = "0.7"
 }
 ```
 
@@ -137,6 +137,27 @@ Example uses of all of the options, assuming one is building an NGINX image
 from ubuntu as an simple example:
 
 <Tabs>
+<Tab heading="HCL2">
+
+```hcl
+post-processor "docker-import" {
+  repository = "local/centos6"
+  tag = "latest"
+  changes = [
+    "USER www-data",
+    "WORKDIR /var/www",
+    "ENV HOSTNAME www.example.com",
+    "VOLUME /test1 /test2",
+    "EXPOSE 80 443",
+    "LABEL version=1.0",
+    "ONBUILD RUN date",
+    "CMD [\"nginx\", \"-g\", \"daemon off;\"]",
+    "ENTRYPOINT /var/www/start.sh",
+  ]
+}
+```
+
+</Tab>
 <Tab heading="JSON">
 
 ```json
@@ -154,27 +175,6 @@ from ubuntu as an simple example:
     "ONBUILD RUN date",
     "CMD [\"nginx\", \"-g\", \"daemon off;\"]",
     "ENTRYPOINT /var/www/start.sh"
-  ]
-}
-```
-
-</Tab>
-<Tab heading="HCL2">
-
-```hcl
-post-processor "docker-import" {
-  repository = "local/centos6"
-  tag = "latest"
-  changes = [
-    "USER www-data",
-    "WORKDIR /var/www",
-    "ENV HOSTNAME www.example.com",
-    "VOLUME /test1 /test2",
-    "EXPOSE 80 443",
-    "LABEL version=1.0",
-    "ONBUILD RUN date",
-    "CMD [\"nginx\", \"-g\", \"daemon off;\"]",
-    "ENTRYPOINT /var/www/start.sh",
   ]
 }
 ```
