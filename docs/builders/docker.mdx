@@ -73,17 +73,6 @@ running container, this one commits the container to an image. The image can
 then be more easily tagged, pushed, etc.
 
 <Tabs>
-<Tab heading="JSON">
-
-```json
-{
-  "type": "docker",
-  "image": "ubuntu",
-  "commit": true
-}
-```
-
-</Tab>
 <Tab heading="HCL2">
 
 ```hcl
@@ -94,6 +83,17 @@ source "docker" "example" {
 
 build {
   sources = ["source.docker.example"]
+}
+```
+
+</Tab>
+<Tab heading="JSON">
+
+```json
+{
+  "type": "docker",
+  "image": "ubuntu",
+  "commit": true
 }
 ```
 
@@ -557,6 +557,24 @@ Registry](https://aws.amazon.com/ecr/). The post processors work as described
 above and example configuration properties are shown below:
 
 <Tabs>
+<Tab heading="HCL2">
+
+```hcl
+post-processors {
+  post-processor "docker-tag" {
+      repository = "12345.dkr.ecr.us-east-1.amazonaws.com/packer"
+      tags = ["0.7"]
+  }
+  post-processor "docker-push" {
+      ecr_login = true
+      aws_access_key = "YOUR KEY HERE"
+      aws_secret_key = "YOUR SECRET KEY HERE"
+      login_server = "12345.dkr.ecr.us-east-1.amazonaws.com"
+  }
+}
+```
+
+</Tab>
 <Tab heading="JSON">
 
 ```json
@@ -577,24 +595,6 @@ above and example configuration properties are shown below:
       }
     ]
   ]
-}
-```
-
-</Tab>
-<Tab heading="HCL2">
-
-```hcl
-post-processors {
-  post-processor "docker-tag" {
-      repository = "12345.dkr.ecr.us-east-1.amazonaws.com/packer"
-      tags = ["0.7"]
-  }
-  post-processor "docker-push" {
-      ecr_login = true
-      aws_access_key = "YOUR KEY HERE"
-      aws_secret_key = "YOUR SECRET KEY HERE"
-      login_server = "12345.dkr.ecr.us-east-1.amazonaws.com"
-  }
 }
 ```
 
