@@ -6,7 +6,7 @@ package docker
 import (
 	"context"
 	"log"
-        "strings"
+	"strings"
 
 	"github.com/hashicorp/hcl/v2/hcldec"
 	"github.com/hashicorp/packer-plugin-sdk/communicator"
