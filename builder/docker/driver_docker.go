@@ -214,6 +214,40 @@ func (d *DockerDriver) Digest(id string) (string, error) {
 	return strings.TrimSpace(stdout.String()), nil
 }
 
+func (d *DockerDriver) Cmd(id string) (string, error) {
+	var stderr, stdout bytes.Buffer
+	cmd := exec.Command(
+		"docker",
+		"inspect",
+		"--format",
+		"{{json .Config.Cmd }}",
+		id)
+	cmd.Stdout = &stdout
+	cmd.Stderr = &stderr
+	if err := cmd.Run(); err != nil {
+		return "", fmt.Errorf("Error: %s\n\nStderr: %s", err, stderr.String())
+	}
+
+	return strings.TrimSpace(stdout.String()), nil
+}
+
+func (d *DockerDriver) Entrypoint(id string) (string, error) {
+	var stderr, stdout bytes.Buffer
+	cmd := exec.Command(
+		"docker",
+		"inspect",
+		"--format",
+		"{{json .Config.Entrypoint }}",
+		id)
+	cmd.Stdout = &stdout
+	cmd.Stderr = &stderr
+	if err := cmd.Run(); err != nil {
+		return "", fmt.Errorf("Error: %s\n\nStderr: %s", err, stderr.String())
+	}
+
+	return strings.TrimSpace(stdout.String()), nil
+}
+
 func (d *DockerDriver) Login(repo, user, pass string) error {
 	d.l.Lock()
 
