@@ -220,7 +220,7 @@ func (d *DockerDriver) Cmd(id string) (string, error) {
 		"docker",
 		"inspect",
 		"--format",
-		"{{json .Config.Cmd }}",
+		"{{if .Config.Cmd}} {{json .Config.Cmd}} {{else}} [] {{end}}",
 		id)
 	cmd.Stdout = &stdout
 	cmd.Stderr = &stderr
@@ -237,7 +237,7 @@ func (d *DockerDriver) Entrypoint(id string) (string, error) {
 		"docker",
 		"inspect",
 		"--format",
-		"{{json .Config.Entrypoint }}",
+		"{{if .Config.Entrypoint}} {{json .Config.Entrypoint}} {{else}} [] {{end}}",
 		id)
 	cmd.Stdout = &stdout
 	cmd.Stderr = &stderr
