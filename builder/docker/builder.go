@@ -6,7 +6,6 @@ package docker
 import (
 	"context"
 	"log"
-	"strings"
 
 	"github.com/hashicorp/hcl/v2/hcldec"
 	"github.com/hashicorp/packer-plugin-sdk/communicator"
@@ -52,27 +51,6 @@ func (b *Builder) Run(ctx context.Context, ui packersdk.Ui, hook packersdk.Hook)
 	}
 	log.Printf("[DEBUG] Docker version: %s", version.String())
 
-	// Fetch default CMD and ENTRYPOINT
-	defaultCmd, _ := driver.Cmd(b.config.Image)
-	defaultEntrypoint, _ := driver.Entrypoint(b.config.Image)
-
-	// Set defaults if not provided by the user
-	hasCmd, hasEntrypoint := false, false
-	for _, change := range b.config.Changes {
-		if strings.HasPrefix(change, "CMD") {
-			hasCmd = true
-		} else if strings.HasPrefix(change, "ENTRYPOINT") {
-			hasEntrypoint = true
-		}
-	}
-
-	if !hasCmd && defaultCmd != "" {
-		b.config.Changes = append(b.config.Changes, "CMD "+defaultCmd)
-	}
-	if !hasEntrypoint && defaultEntrypoint != "" {
-		b.config.Changes = append(b.config.Changes, "ENTRYPOINT "+defaultEntrypoint)
-	}
-
 	// Setup the state bag and initial state for the steps
 	state := new(multistep.BasicStateBag)
 	state.Put("config", &b.config)
@@ -111,6 +89,7 @@ func (b *Builder) Run(ctx context.Context, ui packersdk.Ui, hook packersdk.Hook)
 		log.Print("[DEBUG] Container will be discarded")
 	} else if b.config.Commit {
 		log.Print("[DEBUG] Container will be committed")
+		steps = append(steps, &StepSetDefaults{})
 		steps = append(steps, &StepCommit{
 			GeneratedData: generatedData,
 		})
