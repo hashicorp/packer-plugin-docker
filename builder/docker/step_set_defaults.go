@@ -2,8 +2,9 @@ package docker
 
 import (
 	"context"
-	"github.com/hashicorp/packer-plugin-sdk/multistep"
 	"strings"
+
+	"github.com/hashicorp/packer-plugin-sdk/multistep"
 )
 
 type StepSetDefaults struct{}
