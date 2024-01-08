@@ -7,6 +7,7 @@ integration {
   name = "Docker"
   description = "The docker plugin can be used with HashiCorp Packer to manage containers with Docker."
   identifier = "packer/hashicorp/docker"
+  flags = ["hcp-ready"]
   component {
     type = "builder"
     name = "Docker"
