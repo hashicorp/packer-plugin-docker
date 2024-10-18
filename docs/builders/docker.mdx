@@ -35,16 +35,6 @@ documentation.
 Below is a fully functioning example. It doesn't do anything useful, since no
 provisioners are defined, but it will effectively repackage an image.
 
-**JSON**
-
-```json
-{
-  "type": "docker",
-  "image": "ubuntu",
-  "export_path": "image.tar"
-}
-```
-
 **HCL2**
 
 ```hcl
@@ -58,12 +48,6 @@ build {
 }
 ```
 
-## Basic Example: Commit
-
-Below is another example, the same as above but instead of exporting the
-running container, this one commits the container to an image. The image can
-then be more easily tagged, pushed, etc.
-
 **JSON**
 
 ```json
@@ -73,6 +57,12 @@ then be more easily tagged, pushed, etc.
   "export_path": "image.tar"
 }
 ```
+
+## Basic Example: Commit
+
+Below is another example, the same as above but instead of exporting the
+running container, this one commits the container to an image. The image can
+then be more easily tagged, pushed, etc.
 
 **HCL2**
 
@@ -87,6 +77,16 @@ build {
 }
 ```
 
+**JSON**
+
+```json
+{
+  "type": "docker",
+  "image": "ubuntu",
+  "export_path": "image.tar"
+}
+```
+
 ## Basic Example: Changes to Metadata
 
 Below is an example using the changes argument of the builder. This feature
@@ -97,6 +97,26 @@ Docker](https://docs.docker.com/engine/reference/commandline/commit/).
 
 Example uses of all of the options, assuming one is building an NGINX image
 from ubuntu as an simple example:
+
+**HCL2**
+
+```hcl
+source "docker" "example" {
+    image = "ubuntu"
+    commit = true
+      changes = [
+      "USER www-data",
+      "WORKDIR /var/www",
+      "ENV HOSTNAME www.example.com",
+      "VOLUME /test1 /test2",
+      "EXPOSE 80 443",
+      "LABEL version=1.0",
+      "ONBUILD RUN date",
+      "CMD [\"nginx\", \"-g\", \"daemon off;\"]",
+      "ENTRYPOINT /var/www/start.sh"
+    ]
+}
+```
 
 **JSON**
 
@@ -116,26 +136,6 @@ from ubuntu as an simple example:
     "CMD [\"nginx\", \"-g\", \"daemon off;\"]",
     "ENTRYPOINT /var/www/start.sh"
   ]
-}
-```
-
-**HCL2**
-
-```hcl
-source "docker" "example" {
-    image = "ubuntu"
-    commit = true
-      changes = [
-      "USER www-data",
-      "WORKDIR /var/www",
-      "ENV HOSTNAME www.example.com",
-      "VOLUME /test1 /test2",
-      "EXPOSE 80 443",
-      "LABEL version=1.0",
-      "ONBUILD RUN date",
-      "CMD [\"nginx\", \"-g\", \"daemon off;\"]",
-      "ENTRYPOINT /var/www/start.sh"
-    ]
 }
 ```
 
@@ -188,109 +188,52 @@ standard [communicators](/packer/docs/templates/legacy_json_templates/communicat
 
 You must specify (only) one of `commit`, `discard`, or `export_path`.
 
-- `commit` (bool) - If true, the container will be committed to an image rather than exported.
-
-- `discard` (bool) - Throw away the container when the build is complete. This is useful for
-  the [artifice
-  post-processor](/packer/docs/post-processors/artifice).
-
-- `export_path` (string) - The path where the final container will be exported as a tar file.
-
-- `image` (string) - The base image for the Docker container that will be started. This image
-  will be pulled from the Docker registry if it doesn't already exist.
-
-- `message` (string) - Set a message for the commit.
+@include 'builder/docker/Config-required.mdx'
 
 ### Optional:
 
-- `aws_access_key` (string) - The AWS access key used to communicate with
-  AWS. [Learn how to set this.](/packer/plugins/builders/amazon#specifying-amazon-credentials) 
+@include 'builder/docker/Config-not-required.mdx'
 
-- `aws_secret_key` (string) - The AWS secret key used to communicate with
-  AWS. [Learn how to set this.](/packer/plugins/builders/amazon#specifying-amazon-credentials)
+@include 'builder/docker/AwsAccessConfig-not-required.mdx'
 
-- `aws_token` (string) - The AWS access token to use. This is different from
-  the access key and secret key. If you're not sure what this is, then you
-  probably don't need it. This will also be read from the AWS_SESSION_TOKEN
-  environmental variable.
+## Bootstrapping a build with a Dockerfile
 
-- `aws_profile` (string) - The AWS shared credentials profile used to
-  communicate with AWS. [Learn how to set this.](/packer/plugins/builders/amazon#specifying-amazon-credentials)
+The `build` section of a template allows you to specify a Dockerfile to use for bootstrapping a packer build with a locally-built image.
 
-- `author` (string) - Set the author (e-mail) of a commit.
+When using this, you won't be able to specify an image as source for the container, instead the image built from the Dockerfile will be used for the remainder of the build after that initial step.
 
-- `changes` ([]string) - Dockerfile instructions to add to the commit. Example of instructions
-  are CMD, ENTRYPOINT, ENV, and EXPOSE. Example: [ "USER ubuntu", "WORKDIR
-  /app", "EXPOSE 8080" ]
+### Configuration examples:
 
-- `container_dir` (string) - The directory inside container to mount temp directory from host server
-  for work [file provisioner](/packer/docs/provisioners/file). This defaults
-  to c:/packer-files on windows and /packer-files on other systems.
+**HCL2**
 
-- `device` ([]string) - An array of devices which will be accessible in container when it's run
-  without `--privileged` flag.
+```hcl
+source "docker" "example" {
+    build {
+        path = "Dockerfile"
+    }
+    commit = true
+}
+```
 
-- `cap_add` ([]string) - An array of additional [Linux
-  capabilities](https://docs.docker.com/engine/reference/run/#runtime-privilege-and-linux-capabilities)
-  to grant to the container.
+**JSON**
 
-- `cap_drop` ([]string) - An array of [Linux
-  capabilities](https://docs.docker.com/engine/reference/run/#runtime-privilege-and-linux-capabilities)
-  to drop from the container.
+```json
+{
+  "type": "docker",
+  "build": {
+    "path": "Dockerfile"
+  },
+  "commit": true,
+}
+```
 
-- `exec_user` (string) - Username (UID) to run remote commands with. You can also set the group
-  name/ID if you want: (UID or UID:GID). You may need this if you get
-  permission errors trying to run the shell or other provisioners.
+### Required:
 
-- `privileged` (bool) - If true, run the docker container with the `--privileged` flag. This
-  defaults to false if not set.
+@include 'builder/docker/DockerfileBootstrapConfig-required.mdx'
 
-- `pull` (bool) - If true, the configured image will be pulled using `docker pull` prior
-  to use. Otherwise, it is assumed the image already exists and can be
-  used. This defaults to true if not set.
+### Optional:
 
-- `run_command` ([]string) - An array of arguments to pass to docker run in order to run the
-  container. By default this is set to `["-d", "-i", "-t",
-  "--entrypoint=/bin/sh", "--", "{{.Image}}"]` if you are using a linux
-  container, and `["-d", "-i", "-t", "--entrypoint=powershell", "--",
-  "{{.Image}}"]` if you are running a windows container. `{{.Image}}` is a
-  template variable that corresponds to the image template option. Passing
-  the entrypoint option this way will make it the default entrypoint of
-  the resulting image, so running docker run -it --rm  will start the
-  docker image from the /bin/sh shell interpreter; you could run a script
-  or another shell by running docker run -it --rm  -c /bin/bash. If your
-  docker image embeds a binary intended to be run often, you should
-  consider changing the default entrypoint to point to it.
-
-- `tmpfs` ([]string) - An array of additional tmpfs volumes to mount into this container.
-
-- `volumes` (map[string]string) - A mapping of additional volumes to mount into this container. The key of
-  the object is the host path, the value is the container path.
-
-- `fix_upload_owner` (bool) - If true, files uploaded to the container will be owned by the user the
-  container is running as. If false, the owner will depend on the version
-  of docker installed in the system. Defaults to true.
-
-- `windows_container` (bool) - If "true", tells Packer that you are building a Windows container
-  running on a windows host. This is necessary for building Windows
-  containers, because our normal docker bindings do not work for them.
-
-- `platform` (string) - Set platform if server is multi-platform capable.
-
-- `login` (bool) - This is used to login to dockerhub to pull a private base container. For
-  pushing to dockerhub, see the docker post-processors
-
-- `login_password` (string) - The password to use to authenticate to login.
-
-- `login_server` (string) - The server address to login to.
-
-- `login_username` (string) - The username to use to authenticate to login.
-
-- `ecr_login` (bool) - Defaults to false. If true, the builder will login in order to pull the
-  image from Amazon EC2 Container Registry (ECR). The builder only logs in
-  for the duration of the pull. If true login_server is required and
-  login, login_username, and login_password will be ignored. For more
-  information see the section on ECR.
+@include 'builder/docker/DockerfileBootstrapConfig-not-required.mdx'
 
 ## Build Shared Information Variables
 
@@ -618,6 +561,12 @@ virtualized or dedicated machine.
 While Docker has many features, Packer views Docker simply as a container
 runner. To that end, Packer is able to repeatedly build these containers using
 portable provisioning scripts.
+
+**Note**: starting with v1.1.0, this builder supports bootstrapping a build from a
+Dockerfile. This slightly conflicts with the original intent, but practically,
+for users who already have working Dockerfile-centric pipelines, this limitation
+was a hinderance to adopting Packer for later provisioning images, so we opted
+to add this capability to the builder.
 
 ## Overriding the host directory
 
