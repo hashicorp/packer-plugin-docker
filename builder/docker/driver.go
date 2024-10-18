@@ -13,6 +13,12 @@ import (
 // Docker. The Driver interface also allows the steps to be tested since
 // a mock driver can be shimmed in.
 type Driver interface {
+	// Build runs `docker build` on a Dockerfile
+	//
+	// args is meant to be populated from the config's
+	// `DockerfileBootstrapConfig.BuildArgs` function.
+	Build(args []string) (string, error)
+
 	// Commit the container to a tag
 	Commit(id string, author string, changes []string, message string) (string, error)
 
