@@ -4,6 +4,7 @@
 package docker
 
 import (
+	"fmt"
 	"io"
 
 	"github.com/hashicorp/go-version"
@@ -11,6 +12,10 @@ import (
 
 // MockDriver is a driver implementation that can be used for tests.
 type MockDriver struct {
+	BuildCalled     bool
+	BuildImageId    string
+	BuildImageError error
+
 	CommitCalled      bool
 	CommitContainerId string
 	CommitImageId     string
@@ -93,6 +98,20 @@ type MockDriver struct {
 
 	VersionCalled  bool
 	VersionVersion string
+}
+
+func (d *MockDriver) Build(args []string) (string, error) {
+	d.BuildCalled = true
+
+	if d.BuildImageError != nil {
+		return "", d.BuildImageError
+	}
+
+	if d.BuildImageId == "" {
+		return "", fmt.Errorf("missing config argument for mock driver: BuildImageId")
+	}
+
+	return d.BuildImageId, nil
 }
 
 func (d *MockDriver) Commit(id string, author string, changes []string, message string) (string, error) {

@@ -32,6 +32,36 @@ type DockerDriver struct {
 	l sync.Mutex
 }
 
+func (d *DockerDriver) Build(args []string) (string, error) {
+	stdout := &bytes.Buffer{}
+	stderr := &bytes.Buffer{}
+
+	imageIdFile, err := os.CreateTemp("", "")
+	if err != nil {
+		return "", fmt.Errorf("failed to create image ID file: %s", err)
+	}
+	imageIdFilePath := imageIdFile.Name()
+	imageIdFile.Close()
+
+	cmd := exec.Command("docker", "build")
+	cmd.Args = append(cmd.Args, "--iidfile", imageIdFilePath)
+	cmd.Args = append(cmd.Args, args...)
+	cmd.Stdout = stdout
+	cmd.Stderr = stderr
+
+	err = cmd.Run()
+	if err != nil {
+		return "", fmt.Errorf("docker build failed: %s; stdout: %s; stderr: %s", err, stdout.String(), stderr.String())
+	}
+
+	imageId, err := os.ReadFile(imageIdFilePath)
+	if err != nil {
+		return "", fmt.Errorf("failed to read image ID from file %q: %s", imageIdFilePath, err)
+	}
+
+	return strings.TrimSpace(string(imageId)), nil
+}
+
 func (d *DockerDriver) DeleteImage(id string) error {
 	var stderr bytes.Buffer
 	cmd := exec.Command("docker", "rmi", id)
