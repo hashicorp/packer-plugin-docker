@@ -66,7 +66,11 @@ func (b *Builder) Run(ctx context.Context, ui packersdk.Ui, hook packersdk.Hook)
 			GeneratedData: generatedData,
 		},
 		&StepTempDir{},
+		&stepBuild{
+			buildArgs: b.config.BuildConfig,
+		},
 		&StepPull{
+			bootstrapped:  !b.config.BuildConfig.IsDefault(),
 			GeneratedData: generatedData,
 		},
 		&StepRun{},

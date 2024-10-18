@@ -148,3 +148,104 @@ func TestConfigPrepare_pull(t *testing.T) {
 		t.Fatal("should not pull")
 	}
 }
+
+// Test variations of a build bootstrap config; including unset
+func TestConfigBuildBootstrapConfig(t *testing.T) {
+	tests := []struct {
+		name          string
+		build_obj     interface{}
+		setImage      bool
+		expectFailure bool
+	}{
+		{
+			"error - no image, no build, config is invalid",
+			nil,
+			false,
+			true,
+		},
+		{
+			"error - unknown dockerfile path",
+			map[string]interface{}{
+				"path": "./test-fixtures/no_such_dockerfile",
+			},
+			false,
+			true,
+		},
+		{
+			"error - dockerfile path as directory",
+			map[string]interface{}{
+				"path": "./test-fixtures",
+			},
+			false,
+			true,
+		},
+		{
+			"error - unknown context directory",
+			map[string]interface{}{
+				"path":      "./test-fixtures/sample_dockerfile",
+				"build_dir": "invalid_dir",
+			},
+			false,
+			true,
+		},
+		{
+			"error - context directory as a file",
+			map[string]interface{}{
+				"path":      "./test-fixtures/sample_dockerfile",
+				"build_dir": "./builder.go",
+			},
+			false,
+			true,
+		},
+		{
+			"error - build and image specified",
+			map[string]interface{}{
+				"path": "./test-fixtures/sample_dockerfile",
+			},
+			true,
+			true,
+		},
+		{
+			"success - with just build path",
+			map[string]interface{}{
+				"path": "./test-fixtures/sample_dockerfile",
+			},
+			false,
+			false,
+		},
+		{
+			"success - with build path and valid build dir",
+			map[string]interface{}{
+				"path":      "./test-fixtures/sample_dockerfile",
+				"build_dir": "./test-fixtures",
+			},
+			false,
+			false,
+		},
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			baseconfig := map[string]interface{}{
+				"discard": true,
+			}
+
+			if tt.setImage {
+				baseconfig["image"] = "dummy_image"
+			}
+
+			if tt.build_obj != nil {
+				baseconfig["build"] = tt.build_obj
+			}
+
+			var c Config
+			_, errs := c.Prepare(baseconfig)
+			if errs != nil && !tt.expectFailure {
+				t.Errorf("error: unexpected errors when preparing config: %s", errs)
+			}
+			if errs == nil && tt.expectFailure {
+				t.Errorf("error: expected errors, did not get any")
+			}
+		})
+	}
+}
