@@ -2,11 +2,12 @@
 // SPDX-License-Identifier: MPL-2.0
 
 //go:generate packer-sdc struct-markdown
-//go:generate packer-sdc mapstructure-to-hcl2 -type Config
+//go:generate packer-sdc mapstructure-to-hcl2 -type Config,AwsAccessConfig
 
 package docker
 
 import (
+	"errors"
 	"fmt"
 	"os"
 
@@ -22,13 +23,21 @@ var (
 	errArtifactNotUsed     = fmt.Errorf("No instructions given for handling the artifact; expected commit, discard, or export_path")
 	errArtifactUseConflict = fmt.Errorf("Cannot specify more than one of commit, discard, and export_path")
 	errExportPathNotFile   = fmt.Errorf("export_path must be a file, not a directory")
-	errImageNotSpecified   = fmt.Errorf("Image must be specified")
 )
 
 type Config struct {
 	common.PackerConfig `mapstructure:",squash"`
 	Comm                communicator.Config `mapstructure:",squash"`
-
+	// Configuration for a bootstrap image derived from a Dockerfile
+	//
+	// Specifying this will make the builder run `docker build` on a provided
+	// Dockerfile, and this image will then be used to perform the rest of
+	// the build process.
+	//
+	// For more information on the contents of this object, refer to the
+	// [Bootstrapping a build with a Dockerfile](#bootstrapping-a-build-with-a-dockerfile)
+	// section of this documentation.
+	BuildConfig DockerfileBootstrapConfig `mapstructure:"build"`
 	// Set the author (e-mail) of a commit.
 	Author string `mapstructure:"author"`
 	// Dockerfile instructions to add to the commit. Example of instructions
@@ -71,7 +80,9 @@ type Config struct {
 	// will pull the latest image, so setting `ubuntu` is the same as setting
 	// `ubuntu:latest`. You can also set a distribution digest. For example,
 	// ubuntu@sha256:a0d9e826ab87bd665cfc640598a871b748b4b70a01a4f3d174d4fb02adad07a9
-	Image string `mapstructure:"image" required:"true"`
+	//
+	// This cannot be used at the same time as `build`
+	Image string `mapstructure:"image" required:"false"`
 	// Set a message for the commit.
 	Message string `mapstructure:"message" required:"true"`
 	// If true, run the docker container with the `--privileged` flag. This
@@ -88,6 +99,9 @@ type Config struct {
 	// If true, the configured image will be pulled using `docker pull` prior
 	// to use. Otherwise, it is assumed the image already exists and can be
 	// used. This defaults to true if not set.
+	//
+	// If using `build`, this field will be ignored, as the `pull` option for
+	// this operation will instead have precedence.
 	Pull bool `mapstructure:"pull" required:"false"`
 	// An array of arguments to pass to docker run in order to run the
 	// container. By default this is set to `["-d", "-i", "-t",
@@ -166,19 +180,6 @@ func (c *Config) Prepare(raws ...interface{}) ([]string, error) {
 		}
 	}
 
-	// Default Pull if it wasn't set
-	hasPull := false
-	for _, k := range md.Keys {
-		if k == "pull" {
-			hasPull = true
-			break
-		}
-	}
-
-	if !hasPull {
-		c.Pull = true
-	}
-
 	// Default to the normal Docker type
 	if c.Comm.Type == "" {
 		c.Comm.Type = "docker"
@@ -188,11 +189,44 @@ func (c *Config) Prepare(raws ...interface{}) ([]string, error) {
 	}
 
 	var errs *packersdk.MultiError
+	var warnings []string
+
+	if !c.BuildConfig.IsDefault() {
+		_, err := c.BuildConfig.Prepare()
+		if err != nil {
+			errs = packersdk.MultiErrorAppend(errs, err)
+		}
+
+		if c.Image != "" {
+			errs = packersdk.MultiErrorAppend(errs, errors.New("`image` cannot be specified with a build config"))
+		}
+
+		if c.Pull {
+			warnings = append(warnings, "when running a bootstrap build, the `pull` option is ignored and is replaced by `build.pull` (true by default)")
+			c.Pull = false
+		}
+	} else {
+		// Default Pull if it wasn't set
+		hasPull := false
+		for _, k := range md.Keys {
+			if k == "pull" {
+				hasPull = true
+				break
+			}
+		}
+
+		if !hasPull {
+			c.Pull = true
+		}
+
+		if c.Image == "" {
+			errs = packersdk.MultiErrorAppend(errs,
+				errors.New("missing 'image' attribute or 'build' section, either needs to be specified for a build to run."))
+		}
+	}
+
 	if es := c.Comm.Prepare(&c.ctx); len(es) > 0 {
 		errs = packersdk.MultiErrorAppend(errs, es...)
-	}
-	if c.Image == "" {
-		errs = packersdk.MultiErrorAppend(errs, errImageNotSpecified)
 	}
 
 	if (c.ExportPath != "" && c.Commit) || (c.ExportPath != "" && c.Discard) || (c.Commit && c.Discard) {
@@ -222,8 +256,8 @@ func (c *Config) Prepare(raws ...interface{}) ([]string, error) {
 	}
 
 	if errs != nil && len(errs.Errors) > 0 {
-		return nil, errs
+		return warnings, errs
 	}
 
-	return nil, nil
+	return warnings, nil
 }

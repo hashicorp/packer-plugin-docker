@@ -189,14 +189,6 @@ You must specify (only) one of `commit`, `discard`, or `export_path`.
 
 - `export_path` (string) - The path where the final container will be exported as a tar file.
 
-- `image` (string) - The base image for the Docker container that will be started. This image
-  will be pulled from the Docker registry if it doesn't already exist.
-  Any value format that you can provide to `docker pull` is valid.
-  Example: `ubuntu` or `ubuntu:xenial`. If you only provide the repo, Docker
-  will pull the latest image, so setting `ubuntu` is the same as setting
-  `ubuntu:latest`. You can also set a distribution digest. For example,
-  ubuntu@sha256:a0d9e826ab87bd665cfc640598a871b748b4b70a01a4f3d174d4fb02adad07a9
-
 - `message` (string) - Set a message for the commit.
 
 <!-- End of code generated from the comments of the Config struct in builder/docker/config.go; -->
@@ -205,6 +197,16 @@ You must specify (only) one of `commit`, `discard`, or `export_path`.
 ### Optional:
 
 <!-- Code generated from the comments of the Config struct in builder/docker/config.go; DO NOT EDIT MANUALLY -->
+
+- `build` (DockerfileBootstrapConfig) - Configuration for a bootstrap image derived from a Dockerfile
+  
+  Specifying this will make the builder run `docker build` on a provided
+  Dockerfile, and this image will then be used to perform the rest of
+  the build process.
+  
+  For more information on the contents of this object, refer to the
+  [Bootstrapping a build with a Dockerfile](#bootstrapping-a-build-with-a-dockerfile)
+  section of this documentation.
 
 - `author` (string) - Set the author (e-mail) of a commit.
 
@@ -231,6 +233,16 @@ You must specify (only) one of `commit`, `discard`, or `export_path`.
   name/ID if you want: (UID or UID:GID). You may need this if you get
   permission errors trying to run the shell or other provisioners.
 
+- `image` (string) - The base image for the Docker container that will be started. This image
+  will be pulled from the Docker registry if it doesn't already exist.
+  Any value format that you can provide to `docker pull` is valid.
+  Example: `ubuntu` or `ubuntu:xenial`. If you only provide the repo, Docker
+  will pull the latest image, so setting `ubuntu` is the same as setting
+  `ubuntu:latest`. You can also set a distribution digest. For example,
+  ubuntu@sha256:a0d9e826ab87bd665cfc640598a871b748b4b70a01a4f3d174d4fb02adad07a9
+  
+  This cannot be used at the same time as `build`
+
 - `privileged` (bool) - If true, run the docker container with the `--privileged` flag. This
   defaults to false if not set.
 
@@ -244,6 +256,9 @@ You must specify (only) one of `commit`, `discard`, or `export_path`.
 - `pull` (bool) - If true, the configured image will be pulled using `docker pull` prior
   to use. Otherwise, it is assumed the image already exists and can be
   used. This defaults to true if not set.
+  
+  If using `build`, this field will be ignored, as the `pull` option for
+  this operation will instead have precedence.
 
 - `run_command` ([]string) - An array of arguments to pass to docker run in order to run the
   container. By default this is set to `["-d", "-i", "-t",
@@ -310,6 +325,72 @@ You must specify (only) one of `commit`, `discard`, or `export_path`.
   given LoginServer value.
 
 <!-- End of code generated from the comments of the AwsAccessConfig struct in builder/docker/ecr_login.go; -->
+
+
+## Bootstrapping a build with a Dockerfile
+
+The `build` section of a template allows you to specify a Dockerfile to use for bootstrapping a packer build with a locally-built image.
+
+When using this, you won't be able to specify an image as source for the container, instead the image built from the Dockerfile will be used for the remainder of the build after that initial step.
+
+### Configuration examples:
+
+**HCL2**
+
+```hcl
+source "docker" "example" {
+    build {
+        path = "Dockerfile"
+    }
+    commit = true
+}
+```
+
+**JSON**
+
+```json
+{
+  "type": "docker",
+  "build": {
+    "path": "Dockerfile"
+  },
+  "commit": true,
+}
+```
+
+### Required:
+
+<!-- Code generated from the comments of the DockerfileBootstrapConfig struct in builder/docker/dockerfile_config.go; DO NOT EDIT MANUALLY -->
+
+- `path` (string) - Path to the dockerfile to use for building the base image
+  
+  If set, the builder will invoke `docker build` on it, and use the
+  produced image to continue the build afterwards.
+  
+  Note: Mutually exclusive with "image"
+
+<!-- End of code generated from the comments of the DockerfileBootstrapConfig struct in builder/docker/dockerfile_config.go; -->
+
+
+### Optional:
+
+<!-- Code generated from the comments of the DockerfileBootstrapConfig struct in builder/docker/dockerfile_config.go; DO NOT EDIT MANUALLY -->
+
+- `build_dir` (string) - Directory to invoke `docker build` from
+  
+  Defaults to the directory from which we invoke packer.
+
+- `pull` (boolean) - Pull the image when building the base docker image.
+  
+  Note: defaults to true, to disable this, explicitly set it to false.
+
+- `compress` (bool) - Compress the build context before sending to the docker daemon.
+  
+  This is especially useful if the build context is large, as copying it
+  can take a significant amount of time, while once compressed, this
+  can make builds faster, at the price of extra CPU resources.
+
+<!-- End of code generated from the comments of the DockerfileBootstrapConfig struct in builder/docker/dockerfile_config.go; -->
 
 
 ## Build Shared Information Variables
@@ -638,6 +719,12 @@ virtualized or dedicated machine.
 While Docker has many features, Packer views Docker simply as a container
 runner. To that end, Packer is able to repeatedly build these containers using
 portable provisioning scripts.
+
+**Note**: starting with v1.1.0 of the plugin, this builder supports bootstrapping
+a build from a Dockerfile. This slightly conflicts with the original intent, but
+practically, for users who already have working Dockerfile-centric pipelines,
+this limitation was a hinderance to adopting Packer for later provisioning images,
+so we opted to add this capability to the builder.
 
 ## Overriding the host directory
 

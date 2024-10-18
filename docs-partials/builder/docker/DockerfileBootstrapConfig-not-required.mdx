@@ -1,0 +1,17 @@
+<!-- Code generated from the comments of the DockerfileBootstrapConfig struct in builder/docker/dockerfile_config.go; DO NOT EDIT MANUALLY -->
+
+- `build_dir` (string) - Directory to invoke `docker build` from
+  
+  Defaults to the directory from which we invoke packer.
+
+- `pull` (boolean) - Pull the image when building the base docker image.
+  
+  Note: defaults to true, to disable this, explicitly set it to false.
+
+- `compress` (bool) - Compress the build context before sending to the docker daemon.
+  
+  This is especially useful if the build context is large, as copying it
+  can take a significant amount of time, while once compressed, this
+  can make builds faster, at the price of extra CPU resources.
+
+<!-- End of code generated from the comments of the DockerfileBootstrapConfig struct in builder/docker/dockerfile_config.go; -->
