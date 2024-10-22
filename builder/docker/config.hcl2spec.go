@@ -107,6 +107,7 @@ type FlatConfig struct {
 	Discard                   *bool                          `mapstructure:"discard" required:"true" cty:"discard" hcl:"discard"`
 	CapAdd                    []string                       `mapstructure:"cap_add" required:"false" cty:"cap_add" hcl:"cap_add"`
 	CapDrop                   []string                       `mapstructure:"cap_drop" required:"false" cty:"cap_drop" hcl:"cap_drop"`
+	Executable                *string                        `mapstructure:"docker_path" cty:"docker_path" hcl:"docker_path"`
 	ExecUser                  *string                        `mapstructure:"exec_user" required:"false" cty:"exec_user" hcl:"exec_user"`
 	ExportPath                *string                        `mapstructure:"export_path" required:"true" cty:"export_path" hcl:"export_path"`
 	Image                     *string                        `mapstructure:"image" required:"false" cty:"image" hcl:"image"`
@@ -211,6 +212,7 @@ func (*FlatConfig) HCL2Spec() map[string]hcldec.Spec {
 		"discard":                      &hcldec.AttrSpec{Name: "discard", Type: cty.Bool, Required: false},
 		"cap_add":                      &hcldec.AttrSpec{Name: "cap_add", Type: cty.List(cty.String), Required: false},
 		"cap_drop":                     &hcldec.AttrSpec{Name: "cap_drop", Type: cty.List(cty.String), Required: false},
+		"docker_path":                  &hcldec.AttrSpec{Name: "docker_path", Type: cty.String, Required: false},
 		"exec_user":                    &hcldec.AttrSpec{Name: "exec_user", Type: cty.String, Required: false},
 		"export_path":                  &hcldec.AttrSpec{Name: "export_path", Type: cty.String, Required: false},
 		"image":                        &hcldec.AttrSpec{Name: "image", Type: cty.String, Required: false},
