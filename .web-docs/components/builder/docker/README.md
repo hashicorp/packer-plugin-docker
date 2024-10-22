@@ -24,6 +24,14 @@ documentation.
 Below is a fully functioning example. It doesn't do anything useful, since no
 provisioners are defined, but it will effectively repackage an image.
 
+**HCL2**
+
+```hcl
+source "docker" "example" {
+  image = "ubuntu"
+  export_path = "image.tar"
+}
+
 **JSON**
 
 ```json
@@ -33,14 +41,6 @@ provisioners are defined, but it will effectively repackage an image.
   "export_path": "image.tar"
 }
 ```
-
-**HCL2**
-
-```hcl
-source "docker" "example" {
-  image = "ubuntu"
-  export_path = "image.tar"
-}
 
 build {
   sources = ["source.docker.example"]
@@ -52,16 +52,6 @@ build {
 Below is another example, the same as above but instead of exporting the
 running container, this one commits the container to an image. The image can
 then be more easily tagged, pushed, etc.
-
-**JSON**
-
-```json
-{
-  "type": "docker",
-  "image": "ubuntu",
-  "export_path": "image.tar"
-}
-```
 
 **HCL2**
 
@@ -76,6 +66,16 @@ build {
 }
 ```
 
+**JSON**
+
+```json
+{
+  "type": "docker",
+  "image": "ubuntu",
+  "export_path": "image.tar"
+}
+```
+
 ## Basic Example: Changes to Metadata
 
 Below is an example using the changes argument of the builder. This feature
@@ -86,6 +86,26 @@ Docker](https://docs.docker.com/engine/reference/commandline/commit/).
 
 Example uses of all of the options, assuming one is building an NGINX image
 from ubuntu as an simple example:
+
+**HCL2**
+
+```hcl
+source "docker" "example" {
+    image = "ubuntu"
+    commit = true
+      changes = [
+      "USER www-data",
+      "WORKDIR /var/www",
+      "ENV HOSTNAME www.example.com",
+      "VOLUME /test1 /test2",
+      "EXPOSE 80 443",
+      "LABEL version=1.0",
+      "ONBUILD RUN date",
+      "CMD [\"nginx\", \"-g\", \"daemon off;\"]",
+      "ENTRYPOINT /var/www/start.sh"
+    ]
+}
+```
 
 **JSON**
 
@@ -105,26 +125,6 @@ from ubuntu as an simple example:
     "CMD [\"nginx\", \"-g\", \"daemon off;\"]",
     "ENTRYPOINT /var/www/start.sh"
   ]
-}
-```
-
-**HCL2**
-
-```hcl
-source "docker" "example" {
-    image = "ubuntu"
-    commit = true
-      changes = [
-      "USER www-data",
-      "WORKDIR /var/www",
-      "ENV HOSTNAME www.example.com",
-      "VOLUME /test1 /test2",
-      "EXPOSE 80 443",
-      "LABEL version=1.0",
-      "ONBUILD RUN date",
-      "CMD [\"nginx\", \"-g\", \"daemon off;\"]",
-      "ENTRYPOINT /var/www/start.sh"
-    ]
 }
 ```
 
@@ -395,6 +395,19 @@ definition (a collection of post-processors that are treated as as single
 pipeline, see [Post-Processors](/packer/docs/templates/legacy_json_templates/post-processors) for more
 information):
 
+**HCL2**
+
+```hcl
+  post-processors {
+    post-processor "docker-tag" {
+        repository =  "myrepo/myimage"
+        tags = ["0.7"]
+      }
+    post-processor "docker-push" {}
+  }
+}
+```
+
 **JSON**
 
 ```json
@@ -414,19 +427,6 @@ information):
 }
 ```
 
-**HCL2**
-
-```hcl
-  post-processors {
-    post-processor "docker-tag" {
-        repository =  "myrepo/myimage"
-        tags = ["0.7"]
-      }
-    post-processor "docker-push" {}
-  }
-}
-```
-
 In the above example, the result of each builder is passed through the defined
 sequence of post-processors starting first with the `docker-tag` post-processor
 which tags the committed image with the supplied repository and tag
@@ -437,6 +437,26 @@ repository.
 Going a step further, if you wanted to tag and push an image to multiple
 container repositories, this could be accomplished by defining two,
 nearly-identical sequence definitions, as demonstrated by the example below:
+
+**HCL2**
+
+```hcl
+  post-processors {
+    post-processor "docker-tag" {
+        repository =  "myrepo/myimage1"
+        tags = ["0.7"]
+      }
+    post-processor "docker-push" {}
+  }
+  post-processors {
+    post-processor "docker-tag" {
+        repository =  "myrepo/myimage2"
+        tags = ["0.7"]
+      }
+    post-processor "docker-push" {}
+  }
+}
+```
 
 **JSON**
 
@@ -463,26 +483,6 @@ nearly-identical sequence definitions, as demonstrated by the example below:
 }
 ```
 
-**HCL2**
-
-```hcl
-  post-processors {
-    post-processor "docker-tag" {
-        repository =  "myrepo/myimage1"
-        tags = ["0.7"]
-      }
-    post-processor "docker-push" {}
-  }
-  post-processors {
-    post-processor "docker-tag" {
-        repository =  "myrepo/myimage2"
-        tags = ["0.7"]
-      }
-    post-processor "docker-push" {}
-  }
-}
-```
-
 <span id="amazon-ec2-container-registry"></span>
 
 ## Docker For Windows
@@ -497,6 +497,21 @@ containers, so you must either commit or discard them.
 
 The following is a fully functional template for building a Windows
 container.
+
+**HCL2**
+
+```hcl
+source "docker" "windows" {
+    image = "microsoft/windowsservercore:1709"
+    container_dir = "c:/app"
+    windows_container = true
+    commit = true
+}
+
+build {
+  sources = ["source.docker.example"]
+}
+```
 
 **JSON**
 
@@ -514,26 +529,29 @@ container.
 }
 ```
 
-**HCL2**
-
-```hcl
-source "docker" "windows" {
-    image = "microsoft/windowsservercore:1709"
-    container_dir = "c:/app"
-    windows_container = true
-    commit = true
-}
-
-build {
-  sources = ["source.docker.example"]
-}
-```
-
 ## Amazon EC2 Container Registry
 
 Packer can tag and push images for use in [Amazon EC2 Container
 Registry](https://aws.amazon.com/ecr/). The post processors work as described
 above and example configuration properties are shown below:
+
+**HCL2**
+
+```hcl
+post-processors {
+  post-processor "docker-tag" {
+    repository =  "12345.dkr.ecr.us-east-1.amazonaws.com/packer"
+    tags       = ["0.7"]
+  }
+
+  post-processor "docker-push" {
+    ecr_login = true
+    aws_access_key = "YOUR KEY HERE"
+    aws_secret_key = "YOUR SECRET KEY HERE"
+    login_server = "https://12345.dkr.ecr.us-east-1.amazonaws.com/"
+  }
+}
+```
 
 **JSON**
 
@@ -558,29 +576,29 @@ above and example configuration properties are shown below:
 }
 ```
 
-**HCL2**
-
-```hcl
-post-processors {
-  post-processor "docker-tag" {
-    repository =  "12345.dkr.ecr.us-east-1.amazonaws.com/packer"
-    tags       = ["0.7"]
-  }
-
-  post-processor "docker-push" {
-    ecr_login = true
-    aws_access_key = "YOUR KEY HERE"
-    aws_secret_key = "YOUR SECRET KEY HERE"
-    login_server = "https://12345.dkr.ecr.us-east-1.amazonaws.com/"
-  }
-}
-```
-
 ## Amazon ECR Public Gallery
 
 Packer can tag and push images for use in [Amazon ECR Public
 Gallery](https://gallery.ecr.aws/). The post processors work as described above
 and example configuration properties are shown below:
+
+**HCL2**
+
+```hcl
+    post-processors {
+        post-processor "docker-tag" {
+            repository = "public.ecr.aws/YOUR REGISTRY ALIAS HERE/YOUR REGISTRY NAME HERE"
+            tags       = ["latest"]
+        }
+
+        post-processor "docker-push" {
+            "ecr_login": true,
+            "aws_access_key": "YOUR KEY HERE",
+            "aws_secret_key": "YOUR SECRET KEY HERE",
+            login_server = "public.ecr.aws/YOUR REGISTRY ALIAS HERE"
+        }
+    }
+```
 
 **JSON**
 
@@ -602,24 +620,6 @@ and example configuration properties are shown below:
                 }
             ]
         ]
-    }
-```
-
-**HCL2**
-
-```hcl
-    post-processors {
-        post-processor "docker-tag" {
-            repository = "public.ecr.aws/YOUR REGISTRY ALIAS HERE/YOUR REGISTRY NAME HERE"
-            tags       = ["latest"]
-        }
-
-        post-processor "docker-push" {
-            "ecr_login": true,
-            "aws_access_key": "YOUR KEY HERE",
-            "aws_secret_key": "YOUR SECRET KEY HERE",
-            login_server = "public.ecr.aws/YOUR REGISTRY ALIAS HERE"
-        }
     }
 ```
 
