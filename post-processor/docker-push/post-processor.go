@@ -25,6 +25,7 @@ const BuilderIdImport = "packer.post-processor.docker-import"
 type Config struct {
 	common.PackerConfig `mapstructure:",squash"`
 
+	Executable             string `mapstructure:"docker_path"`
 	Login                  bool
 	LoginUsername          string `mapstructure:"login_username"`
 	LoginPassword          string `mapstructure:"login_password"`
@@ -55,6 +56,10 @@ func (p *PostProcessor) Configure(raws ...interface{}) error {
 	}, raws...)
 	if err != nil {
 		return err
+	}
+
+	if p.config.Executable == "" {
+		p.config.Executable = "docker"
 	}
 
 	if p.config.EcrLogin && p.config.LoginServer == "" {
@@ -96,9 +101,10 @@ func (p *PostProcessor) PostProcess(ctx context.Context, ui packersdk.Ui, artifa
 
 		// If no driver is set, then we use the real driver
 		driver = &docker.DockerDriver{
-			Ctx:       &p.config.ctx,
-			Ui:        ui,
-			ConfigDir: configDir,
+			Executable: p.config.Executable,
+			Ctx:        &p.config.ctx,
+			Ui:         ui,
+			ConfigDir:  configDir,
 		}
 	}
 

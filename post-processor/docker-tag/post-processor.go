@@ -23,6 +23,7 @@ const BuilderId = "packer.post-processor.docker-tag"
 type Config struct {
 	common.PackerConfig `mapstructure:",squash"`
 
+	Executable string `mapstructure:"docker_path"`
 	Repository string `mapstructure:"repository"`
 	// Kept for backwards compatibility
 	Tag   []string `mapstructure:"tag"`
@@ -59,6 +60,10 @@ func (p *PostProcessor) Configure(raws ...interface{}) error {
 
 	p.config.Tags = allTags
 
+	if p.config.Executable == "" {
+		p.config.Executable = "docker"
+	}
+
 	return nil
 
 }
@@ -81,7 +86,11 @@ func (p *PostProcessor) PostProcess(ctx context.Context, ui packersdk.Ui, artifa
 	driver := p.Driver
 	if driver == nil {
 		// If no driver is set, then we use the real driver
-		driver = &docker.DockerDriver{Ctx: &p.config.ctx, Ui: ui}
+		driver = &docker.DockerDriver{
+			Executable: p.config.Executable,
+			Ctx:        &p.config.ctx,
+			Ui:         ui,
+		}
 	}
 
 	importRepo := p.config.Repository
