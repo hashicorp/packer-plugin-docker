@@ -22,6 +22,7 @@ import (
 )
 
 type Communicator struct {
+	Executable    string
 	ContainerID   string
 	HostDir       string
 	ContainerDir  string
@@ -52,7 +53,7 @@ func (c *Communicator) Start(ctx context.Context, remote *packersdk.RemoteCmd) e
 			append([]string{"-u", c.Config.ExecUser}, dockerArgs[2:]...)...)
 	}
 
-	cmd := exec.Command("docker", dockerArgs...)
+	cmd := exec.Command(c.Executable, dockerArgs...)
 
 	var (
 		stdin_w io.WriteCloser
@@ -117,7 +118,7 @@ func (c *Communicator) uploadFile(dst string, src io.Reader, fi *os.FileInfo) er
 	// command format: docker cp /path/to/infile containerid:/path/to/outfile
 	log.Printf("Copying to %s on container %s.", dst, c.ContainerID)
 
-	localCmd := exec.Command("docker", "cp", "-",
+	localCmd := exec.Command(c.Executable, "cp", "-",
 		fmt.Sprintf("%s:%s", c.ContainerID, filepath.Dir(dst)))
 
 	stderrP, err := localCmd.StderrPipe()
@@ -201,7 +202,7 @@ func (c *Communicator) UploadDir(dst string, src string, exclude []string) error
 	}
 
 	// Make the directory, then copy into it
-	localCmd := exec.Command("docker", "cp", dockerSource, fmt.Sprintf("%s:%s", c.ContainerID, dst))
+	localCmd := exec.Command(c.Executable, "cp", dockerSource, fmt.Sprintf("%s:%s", c.ContainerID, dst))
 
 	stderrP, err := localCmd.StderrPipe()
 	if err != nil {
@@ -232,7 +233,7 @@ func (c *Communicator) UploadDir(dst string, src string, exclude []string) error
 // cp to write to stdout, and then copy the stream to our destination io.Writer.
 func (c *Communicator) Download(src string, dst io.Writer) error {
 	log.Printf("Downloading file from container: %s:%s", c.ContainerID, src)
-	localCmd := exec.Command("docker", "cp", fmt.Sprintf("%s:%s", c.ContainerID, src), "-")
+	localCmd := exec.Command(c.Executable, "cp", fmt.Sprintf("%s:%s", c.ContainerID, src), "-")
 
 	pipe, err := localCmd.StdoutPipe()
 	if err != nil {
@@ -355,7 +356,7 @@ func (c *Communicator) fixDestinationOwner(destination string) error {
 	}
 
 	chownArgs := []string{
-		"docker", "exec", "--user", "root", c.ContainerID, "/bin/sh", "-c",
+		c.Executable, "exec", "--user", "root", c.ContainerID, "/bin/sh", "-c",
 		fmt.Sprintf("chown -R %s %s", owner, destination),
 	}
 	if output, err := exec.Command(chownArgs[0], chownArgs[1:]...).CombinedOutput(); err != nil {

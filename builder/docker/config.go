@@ -67,6 +67,16 @@ type Config struct {
 	// capabilities](https://docs.docker.com/engine/reference/run/#runtime-privilege-and-linux-capabilities)
 	// to drop from the container.
 	CapDrop []string `mapstructure:"cap_drop" required:"false"`
+	// Sets the docker binary to use for running commands.
+	//
+	// If you want to use a specific version of the docker binary, or a
+	// docker alternative for building your container, you can specify this
+	// through this option.
+	// **Note**: if using an alternative like `podman`, not all options are
+	// equivalent, and the build may fail in this case.
+	//
+	// Defaults to "docker"
+	Executable string `mapstructure:"docker_path"`
 	// Username (UID) to run remote commands with. You can also set the group
 	// name/ID if you want: (UID or UID:GID). You may need this if you get
 	// permission errors trying to run the shell or other provisioners.
@@ -178,6 +188,10 @@ func (c *Config) Prepare(raws ...interface{}) ([]string, error) {
 		if c.WindowsContainer {
 			c.RunCommand = []string{"-d", "-i", "-t", "--entrypoint=powershell", "--", "{{.Image}}"}
 		}
+	}
+
+	if c.Executable == "" {
+		c.Executable = "docker"
 	}
 
 	// Default to the normal Docker type
