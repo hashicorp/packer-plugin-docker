@@ -18,6 +18,7 @@ type FlatConfig struct {
 	PackerOnError       *string           `mapstructure:"packer_on_error" cty:"packer_on_error" hcl:"packer_on_error"`
 	PackerUserVars      map[string]string `mapstructure:"packer_user_variables" cty:"packer_user_variables" hcl:"packer_user_variables"`
 	PackerSensitiveVars []string          `mapstructure:"packer_sensitive_variables" cty:"packer_sensitive_variables" hcl:"packer_sensitive_variables"`
+	Executable          *string           `mapstructure:"docker_path" cty:"docker_path" hcl:"docker_path"`
 	Login               *bool             `cty:"login" hcl:"login"`
 	LoginUsername       *string           `mapstructure:"login_username" cty:"login_username" hcl:"login_username"`
 	LoginPassword       *string           `mapstructure:"login_password" cty:"login_password" hcl:"login_password"`
@@ -51,6 +52,7 @@ func (*FlatConfig) HCL2Spec() map[string]hcldec.Spec {
 		"packer_on_error":            &hcldec.AttrSpec{Name: "packer_on_error", Type: cty.String, Required: false},
 		"packer_user_variables":      &hcldec.AttrSpec{Name: "packer_user_variables", Type: cty.Map(cty.String), Required: false},
 		"packer_sensitive_variables": &hcldec.AttrSpec{Name: "packer_sensitive_variables", Type: cty.List(cty.String), Required: false},
+		"docker_path":                &hcldec.AttrSpec{Name: "docker_path", Type: cty.String, Required: false},
 		"login":                      &hcldec.AttrSpec{Name: "login", Type: cty.Bool, Required: false},
 		"login_username":             &hcldec.AttrSpec{Name: "login_username", Type: cty.String, Required: false},
 		"login_password":             &hcldec.AttrSpec{Name: "login_password", Type: cty.String, Required: false},

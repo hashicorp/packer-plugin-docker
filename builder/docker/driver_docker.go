@@ -28,6 +28,8 @@ type DockerDriver struct {
 	// Provides an isolated client configuration to each Docker operation to
 	// prevent race conditions.
 	ConfigDir string
+	// The executable to run commands with.
+	Executable string
 
 	l sync.Mutex
 }
@@ -43,7 +45,7 @@ func (d *DockerDriver) Build(args []string) (string, error) {
 	imageIdFilePath := imageIdFile.Name()
 	imageIdFile.Close()
 
-	cmd := exec.Command("docker", "build")
+	cmd := exec.Command(d.Executable, "build")
 	cmd.Args = append(cmd.Args, "--iidfile", imageIdFilePath)
 	cmd.Args = append(cmd.Args, args...)
 	cmd.Stdout = stdout
@@ -51,7 +53,7 @@ func (d *DockerDriver) Build(args []string) (string, error) {
 
 	err = cmd.Run()
 	if err != nil {
-		return "", fmt.Errorf("docker build failed: %s; stdout: %s; stderr: %s", err, stdout.String(), stderr.String())
+		return "", fmt.Errorf("%s build failed: %s; stdout: %s; stderr: %s", d.Executable, err, stdout.String(), stderr.String())
 	}
 
 	imageId, err := os.ReadFile(imageIdFilePath)
@@ -64,7 +66,7 @@ func (d *DockerDriver) Build(args []string) (string, error) {
 
 func (d *DockerDriver) DeleteImage(id string) error {
 	var stderr bytes.Buffer
-	cmd := exec.Command("docker", "rmi", id)
+	cmd := exec.Command(d.Executable, "rmi", id)
 	cmd.Stderr = &stderr
 
 	log.Printf("Deleting image: %s", id)
@@ -98,7 +100,7 @@ func (d *DockerDriver) Commit(id string, author string, changes []string, messag
 	args = append(args, id)
 
 	log.Printf("Committing container with args: %v", args)
-	cmd := exec.Command("docker", args...)
+	cmd := exec.Command(d.Executable, args...)
 	cmd.Stdout = &stdout
 	cmd.Stderr = &stderr
 
@@ -117,7 +119,7 @@ func (d *DockerDriver) Commit(id string, author string, changes []string, messag
 
 func (d *DockerDriver) Export(id string, dst io.Writer) error {
 	var stderr bytes.Buffer
-	cmd := exec.Command("docker", "export", id)
+	cmd := exec.Command(d.Executable, "export", id)
 	cmd.Stdout = dst
 	cmd.Stderr = &stderr
 
@@ -151,7 +153,7 @@ func (d *DockerDriver) Import(path string, changes []string, repo string, platfo
 	args = append(args, "-")
 	args = append(args, repo)
 
-	cmd := exec.Command("docker", args...)
+	cmd := exec.Command(d.Executable, args...)
 	cmd.Stdout = &stdout
 	cmd.Stderr = &stderr
 	stdin, err := cmd.StdinPipe()
@@ -189,7 +191,7 @@ func (d *DockerDriver) Import(path string, changes []string, repo string, platfo
 func (d *DockerDriver) IPAddress(id string) (string, error) {
 	var stderr, stdout bytes.Buffer
 	cmd := exec.Command(
-		"docker",
+		d.Executable,
 		"inspect",
 		"--format",
 		"{{ .NetworkSettings.IPAddress }}",
@@ -207,7 +209,7 @@ func (d *DockerDriver) IPAddress(id string) (string, error) {
 func (d *DockerDriver) Sha256(id string) (string, error) {
 	var stderr, stdout bytes.Buffer
 	cmd := exec.Command(
-		"docker",
+		d.Executable,
 		"inspect",
 		"--format",
 		"{{ .Id }}",
@@ -230,7 +232,7 @@ func (d *DockerDriver) Sha256(id string) (string, error) {
 func (d *DockerDriver) Digest(id string) (string, error) {
 	var stderr, stdout bytes.Buffer
 	cmd := exec.Command(
-		"docker",
+		d.Executable,
 		"inspect",
 		"--format",
 		"{{ ( index .RepoDigests 0 ) }}",
@@ -247,7 +249,7 @@ func (d *DockerDriver) Digest(id string) (string, error) {
 func (d *DockerDriver) Cmd(id string) (string, error) {
 	var stderr, stdout bytes.Buffer
 	cmd := exec.Command(
-		"docker",
+		d.Executable,
 		"inspect",
 		"--format",
 		"{{if .Config.Cmd}} {{json .Config.Cmd}} {{else}} [\"\"] {{end}}",
@@ -264,7 +266,7 @@ func (d *DockerDriver) Cmd(id string) (string, error) {
 func (d *DockerDriver) Entrypoint(id string) (string, error) {
 	var stderr, stdout bytes.Buffer
 	cmd := exec.Command(
-		"docker",
+		d.Executable,
 		"inspect",
 		"--format",
 		"{{if .Config.Entrypoint}} {{json .Config.Entrypoint}} {{else}} [\"\"] {{end}}",
@@ -369,7 +371,7 @@ func (d *DockerDriver) Push(name string, platform string) error {
 
 func (d *DockerDriver) SaveImage(id string, dst io.Writer) error {
 	var stderr bytes.Buffer
-	cmd := exec.Command("docker", "save", id)
+	cmd := exec.Command(d.Executable, "save", id)
 	cmd.Stdout = dst
 	cmd.Stderr = &stderr
 
@@ -433,11 +435,11 @@ func (d *DockerDriver) StartContainer(config *ContainerConfig) (string, error) {
 		args = append(args, v)
 	}
 	d.Ui.Message(fmt.Sprintf(
-		"Run command: docker %s", strings.Join(args, " ")))
+		"Run command: %s %s", d.Executable, strings.Join(args, " ")))
 
 	// Start the container
 	var stdout, stderr bytes.Buffer
-	cmd := exec.Command("docker", args...)
+	cmd := exec.Command(d.Executable, args...)
 	cmd.Stdout = &stdout
 	cmd.Stderr = &stderr
 
@@ -461,18 +463,18 @@ func (d *DockerDriver) StartContainer(config *ContainerConfig) (string, error) {
 }
 
 func (d *DockerDriver) StopContainer(id string) error {
-	if err := exec.Command("docker", "stop", id).Run(); err != nil {
+	if err := exec.Command(d.Executable, "stop", id).Run(); err != nil {
 		return err
 	}
 	return nil
 }
 
 func (d *DockerDriver) KillContainer(id string) error {
-	if err := exec.Command("docker", "kill", id).Run(); err != nil {
+	if err := exec.Command(d.Executable, "kill", id).Run(); err != nil {
 		return err
 	}
 
-	return exec.Command("docker", "rm", id).Run()
+	return exec.Command(d.Executable, "rm", id).Run()
 }
 
 func (d *DockerDriver) TagImage(id string, repo string, force bool) error {
@@ -509,7 +511,7 @@ func (d *DockerDriver) TagImage(id string, repo string, force bool) error {
 	args = append(args, id, repo)
 
 	var stderr bytes.Buffer
-	cmd := exec.Command("docker", args...)
+	cmd := exec.Command(d.Executable, args...)
 	cmd.Stderr = &stderr
 
 	if err := cmd.Start(); err != nil {
@@ -526,7 +528,7 @@ func (d *DockerDriver) TagImage(id string, repo string, force bool) error {
 }
 
 func (d *DockerDriver) Verify() error {
-	if _, err := exec.LookPath("docker"); err != nil {
+	if _, err := exec.LookPath(d.Executable); err != nil {
 		return err
 	}
 
@@ -534,7 +536,7 @@ func (d *DockerDriver) Verify() error {
 }
 
 func (d *DockerDriver) Version() (*version.Version, error) {
-	output, err := exec.Command("docker", "-v").Output()
+	output, err := exec.Command(d.Executable, "-v").Output()
 	if err != nil {
 		return nil, err
 	}
@@ -544,11 +546,13 @@ func (d *DockerDriver) Version() (*version.Version, error) {
 		return nil, fmt.Errorf("unknown version: %s", output)
 	}
 
+	log.Printf("version matches: %s", match)
+
 	return version.NewVersion(string(match[0]))
 }
 
 func (d *DockerDriver) newCommandWithConfig(args ...string) *exec.Cmd {
-	cmd := exec.Command("docker")
+	cmd := exec.Command(d.Executable)
 
 	if d.ConfigDir != "" {
 		cmd.Args = append(cmd.Args, "--config", d.ConfigDir)

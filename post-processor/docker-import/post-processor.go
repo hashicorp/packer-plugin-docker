@@ -22,6 +22,7 @@ const BuilderId = "packer.post-processor.docker-import"
 type Config struct {
 	common.PackerConfig `mapstructure:",squash"`
 
+	Executable string   `mapstructure:"docker_path"`
 	Repository string   `mapstructure:"repository"`
 	Tag        string   `mapstructure:"tag"`
 	Changes    []string `mapstructure:"changes"`
@@ -49,6 +50,10 @@ func (p *PostProcessor) Configure(raws ...interface{}) error {
 		return err
 	}
 
+	if p.config.Executable == "" {
+		p.config.Executable = "docker"
+	}
+
 	return nil
 
 }
@@ -73,7 +78,11 @@ func (p *PostProcessor) PostProcess(ctx context.Context, ui packersdk.Ui, artifa
 		importRepo += ":" + p.config.Tag
 	}
 
-	driver := &docker.DockerDriver{Ctx: &p.config.ctx, Ui: ui}
+	driver := &docker.DockerDriver{
+		Executable: p.config.Executable,
+		Ctx:        &p.config.ctx,
+		Ui:         ui,
+	}
 
 	ui.Message("Importing image: " + artifact.Id())
 	ui.Message("Repository: " + importRepo)

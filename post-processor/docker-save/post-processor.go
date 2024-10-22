@@ -25,7 +25,8 @@ const BuilderId = "packer.post-processor.docker-save"
 type Config struct {
 	common.PackerConfig `mapstructure:",squash"`
 
-	Path string `mapstructure:"path"`
+	Executable string `mapstructure:"docker_path"`
+	Path       string `mapstructure:"path"`
 
 	ctx interpolate.Context
 }
@@ -49,6 +50,10 @@ func (p *PostProcessor) Configure(raws ...interface{}) error {
 	}, raws...)
 	if err != nil {
 		return err
+	}
+
+	if p.config.Executable == "" {
+		p.config.Executable = "docker"
 	}
 
 	return nil
@@ -76,7 +81,11 @@ func (p *PostProcessor) PostProcess(ctx context.Context, ui packersdk.Ui, artifa
 	driver := p.Driver
 	if driver == nil {
 		// If no driver is set, then we use the real driver
-		driver = &docker.DockerDriver{Ctx: &p.config.ctx, Ui: ui}
+		driver = &docker.DockerDriver{
+			Executable: p.config.Executable,
+			Ctx:        &p.config.ctx,
+			Ui:         ui,
+		}
 	}
 
 	ui.Message("Saving image: " + artifact.Id())

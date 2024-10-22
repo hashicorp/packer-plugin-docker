@@ -18,6 +18,7 @@ type FlatConfig struct {
 	PackerOnError       *string           `mapstructure:"packer_on_error" cty:"packer_on_error" hcl:"packer_on_error"`
 	PackerUserVars      map[string]string `mapstructure:"packer_user_variables" cty:"packer_user_variables" hcl:"packer_user_variables"`
 	PackerSensitiveVars []string          `mapstructure:"packer_sensitive_variables" cty:"packer_sensitive_variables" hcl:"packer_sensitive_variables"`
+	Executable          *string           `mapstructure:"docker_path" cty:"docker_path" hcl:"docker_path"`
 	Repository          *string           `mapstructure:"repository" cty:"repository" hcl:"repository"`
 	Tag                 []string          `mapstructure:"tag" cty:"tag" hcl:"tag"`
 	Tags                []string          `mapstructure:"tags" cty:"tags" hcl:"tags"`
@@ -44,6 +45,7 @@ func (*FlatConfig) HCL2Spec() map[string]hcldec.Spec {
 		"packer_on_error":            &hcldec.AttrSpec{Name: "packer_on_error", Type: cty.String, Required: false},
 		"packer_user_variables":      &hcldec.AttrSpec{Name: "packer_user_variables", Type: cty.Map(cty.String), Required: false},
 		"packer_sensitive_variables": &hcldec.AttrSpec{Name: "packer_sensitive_variables", Type: cty.List(cty.String), Required: false},
+		"docker_path":                &hcldec.AttrSpec{Name: "docker_path", Type: cty.String, Required: false},
 		"repository":                 &hcldec.AttrSpec{Name: "repository", Type: cty.String, Required: false},
 		"tag":                        &hcldec.AttrSpec{Name: "tag", Type: cty.List(cty.String), Required: false},
 		"tags":                       &hcldec.AttrSpec{Name: "tags", Type: cty.List(cty.String), Required: false},

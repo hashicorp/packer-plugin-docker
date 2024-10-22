@@ -33,7 +33,7 @@ func (s *StepConnectDocker) Run(ctx context.Context, state multistep.StateBag) m
 		return multistep.ActionHalt
 	}
 
-	containerUser, err := getContainerUser(containerId)
+	containerUser, err := getContainerUser(config.Executable, containerId)
 	if err != nil {
 		state.Put("error", err)
 		return multistep.ActionHalt
@@ -43,6 +43,7 @@ func (s *StepConnectDocker) Run(ctx context.Context, state multistep.StateBag) m
 	// os/exec tricks.
 	if config.WindowsContainer {
 		comm := &WindowsContainerCommunicator{Communicator{
+			Executable:    config.Executable,
 			ContainerID:   containerId,
 			HostDir:       tempDir,
 			ContainerDir:  config.ContainerDir,
@@ -56,6 +57,7 @@ func (s *StepConnectDocker) Run(ctx context.Context, state multistep.StateBag) m
 
 	} else {
 		comm := &Communicator{
+			Executable:    config.Executable,
 			ContainerID:   containerId,
 			HostDir:       tempDir,
 			ContainerDir:  config.ContainerDir,
@@ -71,8 +73,8 @@ func (s *StepConnectDocker) Run(ctx context.Context, state multistep.StateBag) m
 
 func (s *StepConnectDocker) Cleanup(state multistep.StateBag) {}
 
-func getContainerUser(containerId string) (string, error) {
-	inspectArgs := []string{"docker", "inspect", "--format", "{{.Config.User}}", containerId}
+func getContainerUser(executable, containerId string) (string, error) {
+	inspectArgs := []string{executable, "inspect", "--format", "{{.Config.User}}", containerId}
 	stdout, err := exec.Command(inspectArgs[0], inspectArgs[1:]...).Output()
 	if err != nil {
 		errStr := fmt.Sprintf("Failed to inspect the container: %s", err)
