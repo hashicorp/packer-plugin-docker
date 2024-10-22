@@ -177,7 +177,11 @@ standard [communicators](/packer/docs/templates/legacy_json_templates/communicat
 
 You must specify (only) one of `commit`, `discard`, or `export_path`.
 
+<!-- Code generated from the comments of the Config struct in builder/docker/config.go; DO NOT EDIT MANUALLY -->
+
 - `commit` (bool) - If true, the container will be committed to an image rather than exported.
+  Default `false`. If `commit` is `false`, then either `discard` must be
+  set to `true` or an `export_path` must be provided.
 
 - `discard` (bool) - Throw away the container when the build is complete. This is useful for
   the [artifice
@@ -187,24 +191,20 @@ You must specify (only) one of `commit`, `discard`, or `export_path`.
 
 - `image` (string) - The base image for the Docker container that will be started. This image
   will be pulled from the Docker registry if it doesn't already exist.
+  Any value format that you can provide to `docker pull` is valid.
+  Example: `ubuntu` or `ubuntu:xenial`. If you only provide the repo, Docker
+  will pull the latest image, so setting `ubuntu` is the same as setting
+  `ubuntu:latest`. You can also set a distribution digest. For example,
+  ubuntu@sha256:a0d9e826ab87bd665cfc640598a871b748b4b70a01a4f3d174d4fb02adad07a9
 
 - `message` (string) - Set a message for the commit.
 
+<!-- End of code generated from the comments of the Config struct in builder/docker/config.go; -->
+
+
 ### Optional:
 
-- `aws_access_key` (string) - The AWS access key used to communicate with
-  AWS. [Learn how to set this.](/packer/integrations/hashicorp/amazon#specifying-amazon-credentials) 
-
-- `aws_secret_key` (string) - The AWS secret key used to communicate with
-  AWS. [Learn how to set this.](/packer/integrations/hashicorp/amazon#specifying-amazon-credentials)
-
-- `aws_token` (string) - The AWS access token to use. This is different from
-  the access key and secret key. If you're not sure what this is, then you
-  probably don't need it. This will also be read from the AWS_SESSION_TOKEN
-  environmental variable.
-
-- `aws_profile` (string) - The AWS shared credentials profile used to
-  communicate with AWS. [Learn how to set this.](/packer/integrations/hashicorp/amazon#specifying-amazon-credentials)
+<!-- Code generated from the comments of the Config struct in builder/docker/config.go; DO NOT EDIT MANUALLY -->
 
 - `author` (string) - Set the author (e-mail) of a commit.
 
@@ -233,6 +233,13 @@ You must specify (only) one of `commit`, `discard`, or `export_path`.
 
 - `privileged` (bool) - If true, run the docker container with the `--privileged` flag. This
   defaults to false if not set.
+
+- `runtime` (string) - Set the container runtime. A runtime different from the one installed
+  by default with Docker (`runc`) must be installed and configured.
+  The possible values are (non-exhaustive list):
+  `runsc` for [gVisor](https://gvisor.dev/),
+  `kata-runtime` for [Kata Containers](https://katacontainers.io/),
+  `sysbox-runc` for [Nestybox](https://www.nestybox.com/).
 
 - `pull` (bool) - If true, the configured image will be pulled using `docker pull` prior
   to use. Otherwise, it is assumed the image already exists and can be
@@ -264,7 +271,7 @@ You must specify (only) one of `commit`, `discard`, or `export_path`.
   running on a windows host. This is necessary for building Windows
   containers, because our normal docker bindings do not work for them.
 
-- `platform` (string) - Set platform if server is multi-platform capable.
+- `platform` (string) - Set platform if server is multi-platform capable
 
 - `login` (bool) - This is used to login to dockerhub to pull a private base container. For
   pushing to dockerhub, see the docker post-processors
@@ -280,6 +287,30 @@ You must specify (only) one of `commit`, `discard`, or `export_path`.
   for the duration of the pull. If true login_server is required and
   login, login_username, and login_password will be ignored. For more
   information see the section on ECR.
+
+<!-- End of code generated from the comments of the Config struct in builder/docker/config.go; -->
+
+
+<!-- Code generated from the comments of the AwsAccessConfig struct in builder/docker/ecr_login.go; DO NOT EDIT MANUALLY -->
+
+- `aws_access_key` (string) - The AWS access key used to communicate with AWS.
+
+- `aws_secret_key` (string) - The AWS secret key used to communicate with AWS.
+
+- `aws_token` (string) - The AWS access token to use. This is different from
+  the access key and secret key. If you're not sure what this is, then you
+  probably don't need it. This will also be read from the AWS_SESSION_TOKEN
+  environmental variable.
+
+- `aws_profile` (string) - The AWS shared credentials profile used to communicate with AWS.
+
+- `aws_force_use_public_ecr` (bool) - The flag to identify whether to push docker image to Public _or_ Private
+  ECR. If the user sets this to `true` from the config, we will forcefully
+  try to push to Public ECR otherwise set this from code based on the
+  given LoginServer value.
+
+<!-- End of code generated from the comments of the AwsAccessConfig struct in builder/docker/ecr_login.go; -->
+
 
 ## Build Shared Information Variables
 
