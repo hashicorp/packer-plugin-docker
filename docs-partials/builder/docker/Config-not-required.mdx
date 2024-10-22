@@ -1,5 +1,15 @@
 <!-- Code generated from the comments of the Config struct in builder/docker/config.go; DO NOT EDIT MANUALLY -->
 
+- `build` (DockerfileBootstrapConfig) - Configuration for a bootstrap image derived from a Dockerfile
+  
+  Specifying this will make the builder run `docker build` on a provided
+  Dockerfile, and this image will then be used to perform the rest of
+  the build process.
+  
+  For more information on the contents of this object, refer to the
+  [Bootstrapping a build with a Dockerfile](#bootstrapping-a-build-with-a-dockerfile)
+  section of this documentation.
+
 - `author` (string) - Set the author (e-mail) of a commit.
 
 - `changes` ([]string) - Dockerfile instructions to add to the commit. Example of instructions
@@ -25,6 +35,16 @@
   name/ID if you want: (UID or UID:GID). You may need this if you get
   permission errors trying to run the shell or other provisioners.
 
+- `image` (string) - The base image for the Docker container that will be started. This image
+  will be pulled from the Docker registry if it doesn't already exist.
+  Any value format that you can provide to `docker pull` is valid.
+  Example: `ubuntu` or `ubuntu:xenial`. If you only provide the repo, Docker
+  will pull the latest image, so setting `ubuntu` is the same as setting
+  `ubuntu:latest`. You can also set a distribution digest. For example,
+  ubuntu@sha256:a0d9e826ab87bd665cfc640598a871b748b4b70a01a4f3d174d4fb02adad07a9
+  
+  This cannot be used at the same time as `build`
+
 - `privileged` (bool) - If true, run the docker container with the `--privileged` flag. This
   defaults to false if not set.
 
@@ -38,6 +58,9 @@
 - `pull` (bool) - If true, the configured image will be pulled using `docker pull` prior
   to use. Otherwise, it is assumed the image already exists and can be
   used. This defaults to true if not set.
+  
+  If using `build`, this field will be ignored, as the `pull` option for
+  this operation will instead have precedence.
 
 - `run_command` ([]string) - An array of arguments to pass to docker run in order to run the
   container. By default this is set to `["-d", "-i", "-t",

@@ -196,6 +196,45 @@ You must specify (only) one of `commit`, `discard`, or `export_path`.
 
 @include 'builder/docker/AwsAccessConfig-not-required.mdx'
 
+## Bootstrapping a build with a Dockerfile
+
+The `build` section of a template allows you to specify a Dockerfile to use for bootstrapping a packer build with a locally-built image.
+
+When using this, you won't be able to specify an image as source for the container, instead the image built from the Dockerfile will be used for the remainder of the build after that initial step.
+
+### Configuration examples:
+
+**HCL2**
+
+```hcl
+source "docker" "example" {
+    build {
+        path = "Dockerfile"
+    }
+    commit = true
+}
+```
+
+**JSON**
+
+```json
+{
+  "type": "docker",
+  "build": {
+    "path": "Dockerfile"
+  },
+  "commit": true,
+}
+```
+
+### Required:
+
+@include 'builder/docker/DockerfileBootstrapConfig-required.mdx'
+
+### Optional:
+
+@include 'builder/docker/DockerfileBootstrapConfig-not-required.mdx'
+
 ## Build Shared Information Variables
 
 This build shares generated data with provisioners and post-processors via [template engines](/packer/docs/templates/legacy_json_templates/engine)
@@ -522,6 +561,12 @@ virtualized or dedicated machine.
 While Docker has many features, Packer views Docker simply as a container
 runner. To that end, Packer is able to repeatedly build these containers using
 portable provisioning scripts.
+
+**Note**: starting with v1.1.0 of the plugin, this builder supports bootstrapping
+a build from a Dockerfile. This slightly conflicts with the original intent, but
+practically, for users who already have working Dockerfile-centric pipelines,
+this limitation was a hinderance to adopting Packer for later provisioning images,
+so we opted to add this capability to the builder.
 
 ## Overriding the host directory
 
