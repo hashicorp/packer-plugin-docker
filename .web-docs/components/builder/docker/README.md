@@ -32,6 +32,11 @@ source "docker" "example" {
   export_path = "image.tar"
 }
 
+build {
+  sources = ["source.docker.example"]
+}
+```
+
 **JSON**
 
 ```json
@@ -39,11 +44,6 @@ source "docker" "example" {
   "type": "docker",
   "image": "ubuntu",
   "export_path": "image.tar"
-}
-```
-
-build {
-  sources = ["source.docker.example"]
 }
 ```
 
