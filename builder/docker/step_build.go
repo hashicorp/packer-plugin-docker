@@ -5,9 +5,7 @@ package docker
 
 import (
 	"context"
-	"errors"
 	"fmt"
-	"reflect"
 
 	"github.com/hashicorp/packer-plugin-sdk/multistep"
 	"github.com/hashicorp/packer-plugin-sdk/packer"
@@ -25,7 +23,51 @@ func (s *stepBuild) Run(ctx context.Context, state multistep.StateBag) multistep
 
 	ui := state.Get("ui").(packer.Ui)
 	driver := state.Get("driver").(Driver)
+	config, ok := state.Get("config").(*Config)
+	if !ok {
+		err := fmt.Errorf("error encountered obtaining docker config")
+		state.Put("error", err)
+		ui.Error(err.Error())
+		return multistep.ActionHalt
+	}
+
 	ui.Say("Building base image...")
+
+	if config.EcrLogin {
+		ui.Message("Fetching ECR credentials...")
+
+		username, password, err := config.EcrGetLogin(config.LoginServer)
+		if err != nil {
+			err := fmt.Errorf("Error fetching ECR credentials: %s", err)
+			state.Put("error", err)
+			ui.Error(err.Error())
+			return multistep.ActionHalt
+		}
+
+		config.LoginUsername = username
+		config.LoginPassword = password
+	}
+
+	if config.Login || config.EcrLogin {
+		ui.Message("Logging in...")
+		err := driver.Login(
+			config.LoginServer,
+			config.LoginUsername,
+			config.LoginPassword)
+		if err != nil {
+			err := fmt.Errorf("Error logging in: %s", err)
+			state.Put("error", err)
+			ui.Error(err.Error())
+			return multistep.ActionHalt
+		}
+
+		defer func() {
+			ui.Message("Logging out...")
+			if err := driver.Logout(config.LoginServer); err != nil {
+				ui.Error(fmt.Sprintf("Error logging out: %s", err))
+			}
+		}()
+	}
 
 	imageId, err := driver.Build(s.buildArgs.BuildArgs())
 	if err != nil {
@@ -34,18 +76,6 @@ func (s *stepBuild) Run(ctx context.Context, state multistep.StateBag) multistep
 	}
 
 	ui.Sayf("Finished building base image %q", imageId)
-
-	cfg, ok := state.GetOk("config")
-	if !ok {
-		state.Put("error", errors.New("missing config in state; this is a docker plugin bug, please report upstream"))
-		return multistep.ActionHalt
-	}
-
-	config, ok := cfg.(*Config)
-	if !ok {
-		state.Put("error", fmt.Errorf("config object set but type (%s) doesn't match. This is a docker plugin bug, please report upstream", reflect.TypeOf(cfg).String()))
-		return multistep.ActionHalt
-	}
 
 	config.Image = imageId
 
