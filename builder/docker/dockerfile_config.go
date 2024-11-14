@@ -31,6 +31,10 @@ type DockerfileBootstrapConfig struct {
 	//
 	// Defaults to the directory from which we invoke packer.
 	BuildDir string `mapstructure:"build_dir"`
+	
+	// Set platform if server is multi-platform capable
+	Platform string `mapstructure:"platform" required:"false"`
+	
 	// Pull the image when building the base docker image.
 	//
 	// Note: defaults to true, to disable this, explicitly set it to false.
@@ -84,6 +88,10 @@ func (c *DockerfileBootstrapConfig) Prepare() ([]string, error) {
 // BuildArgs returns the list of arguments to pass to docker build.
 func (c DockerfileBootstrapConfig) BuildArgs() []string {
 	retArgs := []string{"-f", c.DockerfilePath}
+
+	if c.Platform != "" {
+		retArgs = append(retArgs, "--platform", c.Platform)
+	}
 
 	if !c.Pull.False() {
 		retArgs = append(retArgs, "--pull")

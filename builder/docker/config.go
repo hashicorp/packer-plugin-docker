@@ -140,6 +140,9 @@ type Config struct {
 	// containers, because our normal docker bindings do not work for them.
 	WindowsContainer bool `mapstructure:"windows_container" required:"false"`
 	// Set platform if server is multi-platform capable
+	//
+	// If using `build`, this field will be ignored, as the `platform` option for
+	// this operation will instead have precedence.
 	Platform string `mapstructure:"platform" required:"false"`
 
 	// This is used to login to dockerhub to pull a private base container. For
@@ -219,6 +222,11 @@ func (c *Config) Prepare(raws ...interface{}) ([]string, error) {
 			warnings = append(warnings, "when running a bootstrap build, the `pull` option is ignored and is replaced by `build.pull` (true by default)")
 			c.Pull = false
 		}
+
+		if c.Platform != "" {
+			warnings = append(warnings, "when running a bootstrap build, the `platform` option is ignored and is replaced by `build.platform`")
+		}
+		c.Platform = c.BuildConfig.Platform
 	} else {
 		// Default Pull if it wasn't set
 		hasPull := false
