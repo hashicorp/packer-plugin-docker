@@ -10,10 +10,11 @@ import (
 // FlatDockerfileBootstrapConfig is an auto-generated flat version of DockerfileBootstrapConfig.
 // Where the contents of a field with a `mapstructure:,squash` tag are bubbled up.
 type FlatDockerfileBootstrapConfig struct {
-	DockerfilePath *string `mapstructure:"path" required:"true" cty:"path" hcl:"path"`
-	BuildDir       *string `mapstructure:"build_dir" cty:"build_dir" hcl:"build_dir"`
-	Pull           *bool   `mapstructure:"pull" cty:"pull" hcl:"pull"`
-	Compress       *bool   `mapstructure:"compress" cty:"compress" hcl:"compress"`
+	DockerfilePath *string           `mapstructure:"path" required:"true" cty:"path" hcl:"path"`
+	BuildDir       *string           `mapstructure:"build_dir" cty:"build_dir" hcl:"build_dir"`
+	Arguments      map[string]string `mapstructure:"arguments" required:"false" cty:"arguments" hcl:"arguments"`
+	Pull           *bool             `mapstructure:"pull" cty:"pull" hcl:"pull"`
+	Compress       *bool             `mapstructure:"compress" cty:"compress" hcl:"compress"`
 }
 
 // FlatMapstructure returns a new FlatDockerfileBootstrapConfig.
@@ -30,6 +31,7 @@ func (*FlatDockerfileBootstrapConfig) HCL2Spec() map[string]hcldec.Spec {
 	s := map[string]hcldec.Spec{
 		"path":      &hcldec.AttrSpec{Name: "path", Type: cty.String, Required: false},
 		"build_dir": &hcldec.AttrSpec{Name: "build_dir", Type: cty.String, Required: false},
+		"arguments": &hcldec.AttrSpec{Name: "arguments", Type: cty.Map(cty.String), Required: false},
 		"pull":      &hcldec.AttrSpec{Name: "pull", Type: cty.Bool, Required: false},
 		"compress":  &hcldec.AttrSpec{Name: "compress", Type: cty.Bool, Required: false},
 	}
