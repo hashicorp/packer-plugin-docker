@@ -99,11 +99,9 @@ func (c DockerfileBootstrapConfig) BuildArgs() []string {
 	}
 
 	// Loops through map of build arguments to add to build command
-	if len(c.Arguments) > 0 {
-		for key, value := range c.Arguments {
-			arg := key + "=" + value
-			retArgs = append(retArgs, "--build-arg", arg)
-		}
+	for key, value := range c.Arguments {
+		arg := key + "=" + value
+		retArgs = append(retArgs, "--build-arg", arg)
 	}
 
 	return append(retArgs, c.BuildDir)
