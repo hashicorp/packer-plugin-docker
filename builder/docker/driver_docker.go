@@ -45,6 +45,7 @@ func (d *DockerDriver) Build(args []string) (string, error) {
 	imageIdFilePath := imageIdFile.Name()
 	imageIdFile.Close()
 
+	log.Printf("Building container with args: %v", args)
 	cmd := exec.Command(d.Executable, "build")
 	cmd.Args = append(cmd.Args, "--iidfile", imageIdFilePath)
 	cmd.Args = append(cmd.Args, args...)
