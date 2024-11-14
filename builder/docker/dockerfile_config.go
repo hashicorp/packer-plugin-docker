@@ -31,6 +31,11 @@ type DockerfileBootstrapConfig struct {
 	//
 	// Defaults to the directory from which we invoke packer.
 	BuildDir string `mapstructure:"build_dir"`
+
+	// A mapping of additional build args to provide. The key of
+	// the object is the argument name, the value is the argument value.
+	Arguments map[string]string `mapstructure:"arguments" required:"false"`
+
 	// Pull the image when building the base docker image.
 	//
 	// Note: defaults to true, to disable this, explicitly set it to false.
@@ -91,6 +96,14 @@ func (c DockerfileBootstrapConfig) BuildArgs() []string {
 
 	if c.Compress {
 		retArgs = append(retArgs, "--compress")
+	}
+
+	// Loops through map of build arguments to add to build command
+	if len(c.Arguments) > 0 {
+		for key, value := range c.Arguments {
+			arg := key + "=" + value
+			retArgs = append(retArgs, "--build-arg", arg)
+		}
 	}
 
 	return append(retArgs, c.BuildDir)
