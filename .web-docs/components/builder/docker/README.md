@@ -297,6 +297,9 @@ You must specify (only) one of `commit`, `discard`, or `export_path`.
   containers, because our normal docker bindings do not work for them.
 
 - `platform` (string) - Set platform if server is multi-platform capable
+  
+  If using `build`, this field will be ignored, as the `platform` option for
+  this operation will instead have precedence.
 
 - `login` (bool) - This is used to login to dockerhub to pull a private base container. For
   pushing to dockerhub, see the docker post-processors
@@ -389,6 +392,8 @@ source "docker" "example" {
 - `build_dir` (string) - Directory to invoke `docker build` from
   
   Defaults to the directory from which we invoke packer.
+
+- `platform` (string) - Set platform if server is multi-platform capable
 
 - `pull` (boolean) - Pull the image when building the base docker image.
   
