@@ -144,8 +144,9 @@ type Config struct {
 	// This cannot be used at the same time as `build`; instead, use `build.platform`
 	Platform string `mapstructure:"platform" required:"false"`
 
-	// This is used to login to dockerhub to pull a private base container. For
-	// pushing to dockerhub, see the docker post-processors
+	// This is used to login to a private docker repository (e.g., dockerhub)
+	// to build or pull a private base container. For pushing to a private
+	//  repository, see the docker post-processors.
 	Login bool `mapstructure:"login" required:"false"`
 	// The password to use to authenticate to login.
 	LoginPassword string `mapstructure:"login_password" required:"false"`
@@ -153,11 +154,11 @@ type Config struct {
 	LoginServer string `mapstructure:"login_server" required:"false"`
 	// The username to use to authenticate to login.
 	LoginUsername string `mapstructure:"login_username" required:"false"`
-	// Defaults to false. If true, the builder will login in order to pull the
-	// image from Amazon EC2 Container Registry (ECR). The builder only logs in
-	// for the duration of the pull. If true login_server is required and
-	// login, login_username, and login_password will be ignored. For more
-	// information see the section on ECR.
+	// Defaults to false. If true, the builder will login in order to build or
+	// pull the image from Amazon EC2 Container Registry (ECR). The builder
+	// only logs in for the duration of the build or pull step. If true,
+	// login_server is required and login, login_username, and login_password
+	// will be ignored. For more information see the section on ECR.
 	EcrLogin        bool `mapstructure:"ecr_login" required:"false"`
 	AwsAccessConfig `mapstructure:",squash"`
 

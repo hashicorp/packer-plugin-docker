@@ -32,6 +32,11 @@ source "docker" "example" {
   export_path = "image.tar"
 }
 
+build {
+  sources = ["source.docker.example"]
+}
+```
+
 **JSON**
 
 ```json
@@ -39,11 +44,6 @@ source "docker" "example" {
   "type": "docker",
   "image": "ubuntu",
   "export_path": "image.tar"
-}
-```
-
-build {
-  sources = ["source.docker.example"]
 }
 ```
 
@@ -298,11 +298,11 @@ You must specify (only) one of `commit`, `discard`, or `export_path`.
 
 - `platform` (string) - Set platform if server is multi-platform capable
   
-  If using `build`, this field will be ignored, as the `platform` option for
-  this operation will instead have precedence.
+  This cannot be used at the same time as `build`; instead, use `build.platform`
 
-- `login` (bool) - This is used to login to dockerhub to pull a private base container. For
-  pushing to dockerhub, see the docker post-processors
+- `login` (bool) - This is used to login to a private docker repository (e.g., dockerhub)
+  to build or pull a private base container. For pushing to a private
+   repository, see the docker post-processors.
 
 - `login_password` (string) - The password to use to authenticate to login.
 
@@ -310,11 +310,11 @@ You must specify (only) one of `commit`, `discard`, or `export_path`.
 
 - `login_username` (string) - The username to use to authenticate to login.
 
-- `ecr_login` (bool) - Defaults to false. If true, the builder will login in order to pull the
-  image from Amazon EC2 Container Registry (ECR). The builder only logs in
-  for the duration of the pull. If true login_server is required and
-  login, login_username, and login_password will be ignored. For more
-  information see the section on ECR.
+- `ecr_login` (bool) - Defaults to false. If true, the builder will login in order to build or
+  pull the image from Amazon EC2 Container Registry (ECR). The builder
+  only logs in for the duration of the build or pull step. If true,
+  login_server is required and login, login_username, and login_password
+  will be ignored. For more information see the section on ECR.
 
 <!-- End of code generated from the comments of the Config struct in builder/docker/config.go; -->
 
@@ -392,6 +392,9 @@ source "docker" "example" {
 - `build_dir` (string) - Directory to invoke `docker build` from
   
   Defaults to the directory from which we invoke packer.
+
+- `arguments` (map[string]string) - A mapping of additional build args to provide. The key of
+  the object is the argument name, the value is the argument value.
 
 - `platform` (string) - Set platform if server is multi-platform capable
 
