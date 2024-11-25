@@ -141,8 +141,7 @@ type Config struct {
 	WindowsContainer bool `mapstructure:"windows_container" required:"false"`
 	// Set platform if server is multi-platform capable
 	//
-	// If using `build`, this field will be ignored, as the `platform` option for
-	// this operation will instead have precedence.
+	// This cannot be used at the same time as `build`; instead, use `build.platform`
 	Platform string `mapstructure:"platform" required:"false"`
 
 	// This is used to login to dockerhub to pull a private base container. For
@@ -224,7 +223,7 @@ func (c *Config) Prepare(raws ...interface{}) ([]string, error) {
 		}
 
 		if c.Platform != "" {
-			warnings = append(warnings, "when running a bootstrap build, the `platform` option is ignored and is replaced by `build.platform`")
+			errs = packersdk.MultiErrorAppend(errs, errors.New("when running a bootstrap build, the `platform` option cannot be specified (use `build.platform` instead)"))
 		}
 		c.Platform = c.BuildConfig.Platform
 	} else {

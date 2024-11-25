@@ -100,8 +100,7 @@
 
 - `platform` (string) - Set platform if server is multi-platform capable
   
-  If using `build`, this field will be ignored, as the `platform` option for
-  this operation will instead have precedence.
+  This cannot be used at the same time as `build`; instead, use `build.platform`
 
 - `login` (bool) - This is used to login to dockerhub to pull a private base container. For
   pushing to dockerhub, see the docker post-processors
