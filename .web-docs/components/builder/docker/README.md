@@ -297,8 +297,6 @@ You must specify (only) one of `commit`, `discard`, or `export_path`.
   containers, because our normal docker bindings do not work for them.
 
 - `platform` (string) - Set platform if server is multi-platform capable
-  
-  This cannot be used at the same time as `build`; instead, use `build.platform`
 
 - `login` (bool) - This is used to login to a private docker repository (e.g., dockerhub)
   to build or pull a private base container. For pushing to a private
@@ -395,8 +393,6 @@ source "docker" "example" {
 
 - `arguments` (map[string]string) - A mapping of additional build args to provide. The key of
   the object is the argument name, the value is the argument value.
-
-- `platform` (string) - Set platform if server is multi-platform capable
 
 - `pull` (boolean) - Pull the image when building the base docker image.
   

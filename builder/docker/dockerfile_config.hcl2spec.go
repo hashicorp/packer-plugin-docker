@@ -13,7 +13,6 @@ type FlatDockerfileBootstrapConfig struct {
 	DockerfilePath *string           `mapstructure:"path" required:"true" cty:"path" hcl:"path"`
 	BuildDir       *string           `mapstructure:"build_dir" cty:"build_dir" hcl:"build_dir"`
 	Arguments      map[string]string `mapstructure:"arguments" required:"false" cty:"arguments" hcl:"arguments"`
-	Platform       *string           `mapstructure:"platform" required:"false" cty:"platform" hcl:"platform"`
 	Pull           *bool             `mapstructure:"pull" cty:"pull" hcl:"pull"`
 	Compress       *bool             `mapstructure:"compress" cty:"compress" hcl:"compress"`
 }
@@ -33,7 +32,6 @@ func (*FlatDockerfileBootstrapConfig) HCL2Spec() map[string]hcldec.Spec {
 		"path":      &hcldec.AttrSpec{Name: "path", Type: cty.String, Required: false},
 		"build_dir": &hcldec.AttrSpec{Name: "build_dir", Type: cty.String, Required: false},
 		"arguments": &hcldec.AttrSpec{Name: "arguments", Type: cty.Map(cty.String), Required: false},
-		"platform":  &hcldec.AttrSpec{Name: "platform", Type: cty.String, Required: false},
 		"pull":      &hcldec.AttrSpec{Name: "pull", Type: cty.Bool, Required: false},
 		"compress":  &hcldec.AttrSpec{Name: "compress", Type: cty.Bool, Required: false},
 	}

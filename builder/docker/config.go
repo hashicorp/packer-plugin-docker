@@ -140,8 +140,6 @@ type Config struct {
 	// containers, because our normal docker bindings do not work for them.
 	WindowsContainer bool `mapstructure:"windows_container" required:"false"`
 	// Set platform if server is multi-platform capable
-	//
-	// This cannot be used at the same time as `build`; instead, use `build.platform`
 	Platform string `mapstructure:"platform" required:"false"`
 
 	// This is used to login to a private docker repository (e.g., dockerhub)
@@ -224,9 +222,9 @@ func (c *Config) Prepare(raws ...interface{}) ([]string, error) {
 		}
 
 		if c.Platform != "" {
-			errs = packersdk.MultiErrorAppend(errs, errors.New("when running a bootstrap build, the `platform` option cannot be specified (use `build.platform` instead)"))
+			c.BuildConfig.Platform = c.Platform
 		}
-		c.Platform = c.BuildConfig.Platform
+
 	} else {
 		// Default Pull if it wasn't set
 		hasPull := false
