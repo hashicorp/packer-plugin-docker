@@ -221,9 +221,7 @@ func (c *Config) Prepare(raws ...interface{}) ([]string, error) {
 			c.Pull = false
 		}
 
-		if c.Platform != "" {
-			c.BuildConfig.Platform = c.Platform
-		}
+		c.BuildConfig.Platform = c.Platform
 
 	} else {
 		// Default Pull if it wasn't set
