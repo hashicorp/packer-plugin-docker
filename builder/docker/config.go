@@ -220,6 +220,9 @@ func (c *Config) Prepare(raws ...interface{}) ([]string, error) {
 			warnings = append(warnings, "when running a bootstrap build, the `pull` option is ignored and is replaced by `build.pull` (true by default)")
 			c.Pull = false
 		}
+
+		c.BuildConfig.Platform = c.Platform
+
 	} else {
 		// Default Pull if it wasn't set
 		hasPull := false

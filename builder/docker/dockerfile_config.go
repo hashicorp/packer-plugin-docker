@@ -36,6 +36,8 @@ type DockerfileBootstrapConfig struct {
 	// the object is the argument name, the value is the argument value.
 	Arguments map[string]string `mapstructure:"arguments" required:"false"`
 
+	Platform string `mapstructure-to-hcl2:",skip"`
+
 	// Pull the image when building the base docker image.
 	//
 	// Note: defaults to true, to disable this, explicitly set it to false.
@@ -89,6 +91,10 @@ func (c *DockerfileBootstrapConfig) Prepare() ([]string, error) {
 // BuildArgs returns the list of arguments to pass to docker build.
 func (c DockerfileBootstrapConfig) BuildArgs() []string {
 	retArgs := []string{"-f", c.DockerfilePath}
+
+	if c.Platform != "" {
+		retArgs = append(retArgs, "--platform", c.Platform)
+	}
 
 	if !c.Pull.False() {
 		retArgs = append(retArgs, "--pull")
