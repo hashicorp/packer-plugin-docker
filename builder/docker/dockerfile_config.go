@@ -38,6 +38,7 @@ type DockerfileBootstrapConfig struct {
 	// the object is the argument name, the value is the argument value.
 	Arguments map[string]string `mapstructure:"arguments" required:"false"`
 
+	// Inherited from the global configuration: set platform if server is multi-platform capable
 	Platform string `mapstructure-to-hcl2:",skip"`
 
 	// Pull the image when building the base docker image.
