@@ -60,6 +60,10 @@ func (c *DockerfileBootstrapConfig) Prepare() ([]string, error) {
 		return nil, nil
 	}
 
+	if c.DockerfilePath == "" {
+		return nil, fmt.Errorf("`path` is required for bootstrapping a build with `docker build`")
+	}
+
 	if c.BuildDir == "" {
 		c.BuildDir = "."
 	}
