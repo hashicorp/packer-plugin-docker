@@ -11,6 +11,8 @@ import (
 	"os"
 	"path/filepath"
 
+	"github.com/google/go-cmp/cmp"
+	"github.com/google/go-cmp/cmp/cmpopts"
 	"github.com/hashicorp/packer-plugin-sdk/template/config"
 )
 
@@ -113,18 +115,14 @@ func (c DockerfileBootstrapConfig) BuildArgs() []string {
 	return append(retArgs, c.BuildDir)
 }
 
+// IsDefault returns whether the DockerfileBootstrapConfig is the empty one or not
 func (c DockerfileBootstrapConfig) IsDefault() bool {
-	if c.BuildDir != "" {
-		return false
+	// We can ignore arguments for the comparison since a map can be either
+	// nil or empty, and should be considered equal in either case.
+	cmpOpts := []cmp.Option{
+		cmpopts.IgnoreFields(DockerfileBootstrapConfig{}, "Arguments"),
 	}
 
-	if c.Compress {
-		return false
-	}
-
-	if c.DockerfilePath != "" {
-		return false
-	}
-
-	return true
+	return cmp.Equal(c, DockerfileBootstrapConfig{}, cmpOpts...) &&
+		(c.Arguments == nil || len(c.Arguments) == 0)
 }
