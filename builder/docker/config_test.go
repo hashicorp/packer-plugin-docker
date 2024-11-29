@@ -164,6 +164,14 @@ func TestConfigBuildBootstrapConfig(t *testing.T) {
 			true,
 		},
 		{
+			"error - no image, build is default with empty map, config is invalid",
+			map[string]interface{}{
+				"arguments": map[string]string{},
+			},
+			false,
+			true,
+		},
+		{
 			"error - unknown dockerfile path",
 			map[string]interface{}{
 				"path": "./test-fixtures/no_such_dockerfile",
