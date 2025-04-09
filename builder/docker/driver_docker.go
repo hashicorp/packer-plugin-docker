@@ -420,6 +420,7 @@ func (d *DockerDriver) StartContainer(config *ContainerConfig) (string, error) {
 	for _, v := range config.TmpFs {
 		args = append(args, "--tmpfs", v)
 	}
+
 	for host, guest := range config.Volumes {
 		if strings.HasPrefix(host, "~/") {
 			homedir, _ := os.UserHomeDir()

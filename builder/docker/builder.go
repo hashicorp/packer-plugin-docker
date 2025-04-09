@@ -98,6 +98,11 @@ func (b *Builder) Run(ctx context.Context, ui packersdk.Ui, hook packersdk.Hook)
 	} else if b.config.Commit {
 		log.Print("[DEBUG] Container will be committed")
 		steps = append(steps, &StepSetDefaults{})
+		if b.config.RemoveContainerDir {
+			steps = append(steps, &StepRemoveContainerDir{
+				ContainerDir: b.config.ContainerDir,
+			})
+		}
 		steps = append(steps, &StepCommit{
 			GeneratedData: generatedData,
 		})

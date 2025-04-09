@@ -160,6 +160,8 @@ type Config struct {
 	EcrLogin        bool `mapstructure:"ecr_login" required:"false"`
 	AwsAccessConfig `mapstructure:",squash"`
 
+	RemoveContainerDir bool `mapstructure:"remove_container_dir" required:"false"`
+
 	ctx interpolate.Context
 }
 
@@ -265,7 +267,7 @@ func (c *Config) Prepare(raws ...interface{}) ([]string, error) {
 		if c.WindowsContainer {
 			c.ContainerDir = "c:/packer-files"
 		} else {
-			c.ContainerDir = "/packer-files"
+			c.ContainerDir = "/tmp/packer-files"
 		}
 	}
 

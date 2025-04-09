@@ -40,6 +40,10 @@ func (s *StepCommit) Run(ctx context.Context, state multistep.StateBag) multiste
 			return multistep.ActionHalt
 		}
 	}
+	if config.RemoveContainerDir {
+
+	}
+
 	ui.Say("Committing the container")
 	imageId, err := driver.Commit(containerId, config.Author, config.Changes, config.Message)
 	if err != nil {

@@ -132,6 +132,7 @@ type FlatConfig struct {
 	Token                     *string                        `mapstructure:"aws_token" required:"false" cty:"aws_token" hcl:"aws_token"`
 	Profile                   *string                        `mapstructure:"aws_profile" required:"false" cty:"aws_profile" hcl:"aws_profile"`
 	PublicEcrGallery          *bool                          `mapstructure:"aws_force_use_public_ecr" required:"false" cty:"aws_force_use_public_ecr" hcl:"aws_force_use_public_ecr"`
+	RemoveContainerDir        *bool                          `mapstructure:"remove_container_dir" required:"false" cty:"remove_container_dir" hcl:"remove_container_dir"`
 }
 
 // FlatMapstructure returns a new FlatConfig.
@@ -237,6 +238,7 @@ func (*FlatConfig) HCL2Spec() map[string]hcldec.Spec {
 		"aws_token":                    &hcldec.AttrSpec{Name: "aws_token", Type: cty.String, Required: false},
 		"aws_profile":                  &hcldec.AttrSpec{Name: "aws_profile", Type: cty.String, Required: false},
 		"aws_force_use_public_ecr":     &hcldec.AttrSpec{Name: "aws_force_use_public_ecr", Type: cty.Bool, Required: false},
+		"remove_container_dir":         &hcldec.AttrSpec{Name: "remove_container_dir", Type: cty.Bool, Required: false},
 	}
 	return s
 }
