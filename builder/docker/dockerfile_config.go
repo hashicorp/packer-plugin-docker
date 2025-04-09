@@ -128,6 +128,5 @@ func (c DockerfileBootstrapConfig) IsDefault() bool {
 		cmpopts.IgnoreFields(DockerfileBootstrapConfig{}, "Arguments"),
 	}
 
-	return cmp.Equal(c, DockerfileBootstrapConfig{}, cmpOpts...) &&
-		(c.Arguments == nil || len(c.Arguments) == 0)
+	return cmp.Equal(c, DockerfileBootstrapConfig{}, cmpOpts...) && len(c.Arguments) == 0
 }
