@@ -5,6 +5,7 @@ package docker
 
 import (
 	"context"
+	"errors"
 	"fmt"
 	"os/exec"
 	"strings"
@@ -81,7 +82,7 @@ func getContainerUser(executable, containerId string) (string, error) {
 		if ee, ok := err.(*exec.ExitError); ok {
 			errStr = fmt.Sprintf("%s, %s", errStr, ee.Stderr)
 		}
-		return "", fmt.Errorf(errStr)
+		return "", errors.New(errStr)
 	}
 	return strings.TrimSpace(string(stdout)), nil
 }

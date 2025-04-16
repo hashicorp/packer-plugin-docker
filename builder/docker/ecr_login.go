@@ -156,7 +156,7 @@ func (c *AwsAccessConfig) EcrGetLogin(ecrUrl string) (string, string, error) {
 	// the config.
 	creds, err := c.GetCredentials(config)
 	if err != nil {
-		return "", "", fmt.Errorf(err.Error())
+		return "", "", err
 	}
 	config.WithCredentials(creds)
 
@@ -193,7 +193,7 @@ func (c *AwsAccessConfig) EcrGetLogin(ecrUrl string) (string, string, error) {
 	}
 	resp, err := service.GetAuthorizationToken(params)
 	if err != nil {
-		return "", "", fmt.Errorf(err.Error())
+		return "", "", err
 	}
 
 	auth, err := base64.StdEncoding.DecodeString(*resp.AuthorizationData[0].AuthorizationToken)
