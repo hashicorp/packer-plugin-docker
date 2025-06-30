@@ -57,6 +57,9 @@ func (d *DockerDriver) Build(args []string) (string, error) {
 		return "", fmt.Errorf("%s build failed: %s; stdout: %s; stderr: %s", d.Executable, err, stdout.String(), stderr.String())
 	}
 
+	log.Print("[DEBUG] Logging Docker Build Output")
+	log.Print(stderr)
+
 	imageId, err := os.ReadFile(imageIdFilePath)
 	if err != nil {
 		return "", fmt.Errorf("failed to read image ID from file %q: %s", imageIdFilePath, err)
