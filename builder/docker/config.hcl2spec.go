@@ -99,6 +99,7 @@ type FlatConfig struct {
 	WinRMInsecure             *bool                          `mapstructure:"winrm_insecure" cty:"winrm_insecure" hcl:"winrm_insecure"`
 	WinRMUseNTLM              *bool                          `mapstructure:"winrm_use_ntlm" cty:"winrm_use_ntlm" hcl:"winrm_use_ntlm"`
 	BuildConfig               *FlatDockerfileBootstrapConfig `mapstructure:"build" cty:"build" hcl:"build"`
+	BuildOnly                 *bool                          `mapstructure:"build_only" cty:"build_only" hcl:"build_only"`
 	Author                    *string                        `mapstructure:"author" cty:"author" hcl:"author"`
 	Changes                   []string                       `mapstructure:"changes" cty:"changes" hcl:"changes"`
 	Commit                    *bool                          `mapstructure:"commit" required:"true" cty:"commit" hcl:"commit"`
@@ -204,6 +205,7 @@ func (*FlatConfig) HCL2Spec() map[string]hcldec.Spec {
 		"winrm_insecure":               &hcldec.AttrSpec{Name: "winrm_insecure", Type: cty.Bool, Required: false},
 		"winrm_use_ntlm":               &hcldec.AttrSpec{Name: "winrm_use_ntlm", Type: cty.Bool, Required: false},
 		"build":                        &hcldec.BlockSpec{TypeName: "build", Nested: hcldec.ObjectSpec((*FlatDockerfileBootstrapConfig)(nil).HCL2Spec())},
+		"build_only":                   &hcldec.AttrSpec{Name: "build_only", Type: cty.Bool, Required: false},
 		"author":                       &hcldec.AttrSpec{Name: "author", Type: cty.String, Required: false},
 		"changes":                      &hcldec.AttrSpec{Name: "changes", Type: cty.List(cty.String), Required: false},
 		"commit":                       &hcldec.AttrSpec{Name: "commit", Type: cty.Bool, Required: false},
