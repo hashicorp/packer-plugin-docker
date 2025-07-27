@@ -3,3 +3,4 @@ dist/*
 packer-plugin-docker
 .docs/*
 crash.log
+.idea/
