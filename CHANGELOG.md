@@ -5,7 +5,7 @@
 * Change in the release process of the packer plugins binaries to releases it in the [HashiCorp official releases site](https://releases.hashicorp.com/packer-plugin-docker/).
   This change standardizes our release process and ensures a more secure and reliable pipeline for plugin delivery.
 
-# Latest Release
+# Changelog of previous releases can be found below.
 
 Please refer to [releases](https://github.com/hashicorp/packer-plugin-docker/releases) for the latest CHANGELOG information.
 
