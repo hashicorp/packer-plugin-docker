@@ -25,3 +25,4 @@ artifacts {
       "packer-plugin-docker_${version}_windows_386.zip",
       "packer-plugin-docker_${version}_windows_amd64.zip",
   ]
+}
