@@ -2,11 +2,6 @@
 
 ### IMPROVEMENTS:
 
-* core: Changes to pull official packer plugins binaries from official site (releases.hashicorp.com).
-  This change allows Packer to automatically download and install official plugins from the HashiCorp official release site.
-  This change standardizes our release process and ensures a more secure and reliable pipeline for plugin delivery.
-  [GH-13431](https://github.com/hashicorp/packer/pull/13431)
-
 * CRT migration changes by @anshulsharma-hashicorp in https://github.com/hashicorp/packer-plugin-docker/pull/210
   Change in the release process of the packer plugins binaries to releases it in the [HashiCorp official releases site](https://releases.hashicorp.com/packer-plugin-docker/).
   This change standardizes our release process and ensures a more secure and reliable pipeline for plugin delivery.
