@@ -425,14 +425,14 @@ container.
 
 ```hcl
 source "docker" "windows" {
-    image = "microsoft/windowsservercore:1709"
+    image = "mcr.microsoft.com/windows/servercore:ltsc2022"
     container_dir = "c:/app"
     windows_container = true
     commit = true
 }
 
 build {
-  sources = ["source.docker.example"]
+  sources = ["source.docker.windows"]
 }
 ```
 
@@ -443,7 +443,7 @@ build {
   "builders": [
     {
       "type": "docker",
-      "image": "microsoft/windowsservercore:1709",
+      "image": "mcr.microsoft.com/windows/servercore:ltsc2022",
       "container_dir": "c:/app",
       "windows_container": true,
       "commit": true
