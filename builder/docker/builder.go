@@ -60,37 +60,52 @@ func (b *Builder) Run(ctx context.Context, ui packersdk.Ui, hook packersdk.Hook)
 	state.Put("config", &b.config)
 	state.Put("hook", hook)
 	state.Put("ui", ui)
-	generatedData := &packerbuilderdata.GeneratedData{State: state}
+	var generatedData *packerbuilderdata.GeneratedData
+	if !b.config.BuildOnly {
+		generatedData = &packerbuilderdata.GeneratedData{State: state}
+	}
 
 	// Setup the driver that will talk to Docker
 	state.Put("driver", driver)
 
-	steps := []multistep.Step{
-		&StepDefaultGeneratedData{
-			GeneratedData: generatedData,
-		},
-		&StepTempDir{},
-		&stepBuild{
-			buildArgs: b.config.BuildConfig,
-		},
-		&StepPull{
-			bootstrapped:  !b.config.BuildConfig.IsDefault(),
-			GeneratedData: generatedData,
-		},
-		&StepRun{},
-		&communicator.StepConnect{
-			Config:    &b.config.Comm,
-			Host:      commHost(b.config.Comm.Host()),
-			SSHConfig: b.config.Comm.SSHConfigFunc(),
-			CustomConnect: map[string]multistep.Step{
-				"docker":                 &StepConnectDocker{},
-				"dockerWindowsContainer": &StepConnectDocker{},
+	var steps []multistep.Step
+	if !b.config.BuildOnly {
+		steps = []multistep.Step{
+			&StepDefaultGeneratedData{
+				GeneratedData: generatedData,
 			},
-		},
-		&commonsteps.StepProvision{},
-		&commonsteps.StepCleanupTempKeys{
-			Comm: &b.config.Comm,
-		},
+			&StepTempDir{},
+			&stepBuild{
+				buildArgs: b.config.BuildConfig,
+			},
+			&StepPull{
+				bootstrapped:  !b.config.BuildConfig.IsDefault(),
+				GeneratedData: generatedData,
+			},
+			&StepRun{},
+			&communicator.StepConnect{
+				Config:    &b.config.Comm,
+				Host:      commHost(b.config.Comm.Host()),
+				SSHConfig: b.config.Comm.SSHConfigFunc(),
+				CustomConnect: map[string]multistep.Step{
+					"docker":                 &StepConnectDocker{},
+					"dockerWindowsContainer": &StepConnectDocker{},
+				},
+			},
+			&commonsteps.StepProvision{},
+			&commonsteps.StepCleanupTempKeys{
+				Comm: &b.config.Comm,
+			},
+		}
+	} else {
+		steps = []multistep.Step{
+			&stepBuild{
+				buildArgs: b.config.BuildConfig,
+			},
+			&commonsteps.StepCleanupTempKeys{
+				Comm: &b.config.Comm,
+			},
+		}
 	}
 
 	if b.config.Discard {
@@ -98,9 +113,11 @@ func (b *Builder) Run(ctx context.Context, ui packersdk.Ui, hook packersdk.Hook)
 	} else if b.config.Commit {
 		log.Print("[DEBUG] Container will be committed")
 		steps = append(steps, &StepSetDefaults{})
-		steps = append(steps, &StepCommit{
-			GeneratedData: generatedData,
-		})
+		if !b.config.BuildOnly {
+			steps = append(steps, &StepCommit{
+				GeneratedData: generatedData,
+			})
+		}
 	} else if b.config.ExportPath != "" {
 		log.Printf("[DEBUG] Container will be exported to %s", b.config.ExportPath)
 		steps = append(steps, new(StepExport))
@@ -129,11 +146,20 @@ func (b *Builder) Run(ctx context.Context, ui packersdk.Ui, hook packersdk.Hook)
 
 	var artifact packersdk.Artifact
 	if b.config.Commit {
-		artifact = &ImportArtifact{
-			IdValue:        state.Get("image_id").(string),
-			BuilderIdValue: BuilderIdImport,
-			Driver:         driver,
-			StateData:      stateData,
+		if b.config.BuildOnly {
+			artifact = &ImportArtifact{
+				IdValue:        b.config.Image,
+				BuilderIdValue: BuilderIdImport,
+				Driver:         driver,
+				StateData:      stateData,
+			}
+		} else {
+			artifact = &ImportArtifact{
+				IdValue:        state.Get("image_id").(string),
+				BuilderIdValue: BuilderIdImport,
+				Driver:         driver,
+				StateData:      stateData,
+			}
 		}
 	} else {
 		artifact = &ExportArtifact{
