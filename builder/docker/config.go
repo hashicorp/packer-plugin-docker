@@ -38,6 +38,10 @@ type Config struct {
 	// [Bootstrapping a build with a Dockerfile](#bootstrapping-a-build-with-a-dockerfile)
 	// section of this documentation.
 	BuildConfig DockerfileBootstrapConfig `mapstructure:"build"`
+	// If true, the resulting image will be built only using `build` section,
+	// which effectively means that the image will be buit using `docker build`
+	// command only.
+	BuildOnly bool `mapstructure:"build_only" required:"false"`
 	// Set the author (e-mail) of a commit.
 	Author string `mapstructure:"author"`
 	// Dockerfile instructions to add to the commit. Example of instructions
