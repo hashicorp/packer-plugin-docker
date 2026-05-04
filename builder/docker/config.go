@@ -139,6 +139,9 @@ type Config struct {
 	// running on a windows host. This is necessary for building Windows
 	// containers, because our normal docker bindings do not work for them.
 	WindowsContainer bool `mapstructure:"windows_container" required:"false"`
+	// If true, creates parent directories for file and directory uploads to
+	// Windows containers. This only applies when `windows_container` is true.
+	WindowsCreateParentDirs bool `mapstructure:"windows_create_parent_dirs" required:"false"`
 	// Set platform if server is multi-platform capable
 	Platform string `mapstructure:"platform" required:"false"`
 
@@ -205,6 +208,9 @@ func (c *Config) Prepare(raws ...interface{}) ([]string, error) {
 
 	var errs *packersdk.MultiError
 	var warnings []string
+	if c.WindowsCreateParentDirs && !c.WindowsContainer {
+		warnings = append(warnings, "`windows_create_parent_dirs` only applies when `windows_container` is true")
+	}
 
 	if !c.BuildConfig.IsDefault() {
 		_, err := c.BuildConfig.Prepare()

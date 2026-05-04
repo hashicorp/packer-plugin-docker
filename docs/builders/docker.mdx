@@ -418,6 +418,11 @@ If you are building a Windows container, you must set the template option
 `"windows_container": true`. Please note that docker cannot export Windows
 containers, so you must either commit or discard them.
 
+Set `"windows_create_parent_dirs": true` to have Packer create missing parent
+directories before uploading files or directories to Windows containers. This
+helps Windows container uploads behave more like Linux container uploads that
+use `docker cp`.
+
 The following is a fully functional template for building a Windows
 container.
 
@@ -428,6 +433,7 @@ source "docker" "windows" {
     image = "microsoft/windowsservercore:1709"
     container_dir = "c:/app"
     windows_container = true
+    windows_create_parent_dirs = true
     commit = true
 }
 
@@ -446,6 +452,7 @@ build {
       "image": "microsoft/windowsservercore:1709",
       "container_dir": "c:/app",
       "windows_container": true,
+      "windows_create_parent_dirs": true,
       "commit": true
     }
   ]

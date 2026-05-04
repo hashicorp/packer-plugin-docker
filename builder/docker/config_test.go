@@ -6,6 +6,7 @@ package docker
 import (
 	"io/ioutil"
 	"os"
+	"strings"
 	"testing"
 )
 
@@ -146,6 +147,40 @@ func TestConfigPrepare_pull(t *testing.T) {
 	testConfigOk(t, warns, errs)
 	if c.Pull {
 		t.Fatal("should not pull")
+	}
+}
+
+func TestConfigPrepare_windowsCreateParentDirs(t *testing.T) {
+	raw := testConfig()
+	var c Config
+	warns, errs := c.Prepare(raw)
+	testConfigOk(t, warns, errs)
+	if c.WindowsCreateParentDirs {
+		t.Fatal("windows_create_parent_dirs should default to false")
+	}
+
+	raw = testConfig()
+	raw["windows_container"] = true
+	raw["windows_create_parent_dirs"] = true
+	c = Config{}
+	warns, errs = c.Prepare(raw)
+	testConfigOk(t, warns, errs)
+	if !c.WindowsCreateParentDirs {
+		t.Fatal("windows_create_parent_dirs should be true")
+	}
+
+	raw = testConfig()
+	raw["windows_create_parent_dirs"] = true
+	c = Config{}
+	warns, errs = c.Prepare(raw)
+	if errs != nil {
+		t.Fatalf("bad: %s", errs)
+	}
+	if len(warns) != 1 {
+		t.Fatalf("expected one warning, got %#v", warns)
+	}
+	if !strings.Contains(warns[0], "windows_create_parent_dirs") {
+		t.Fatalf("expected windows_create_parent_dirs warning, got %#v", warns)
 	}
 }
 
