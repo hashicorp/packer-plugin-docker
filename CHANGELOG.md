@@ -1,3 +1,9 @@
+## Unreleased
+
+### FEATURES:
+
+* builder/docker: Add `windows_create_parent_dirs` option to automatically create destination parent directories on uploads to Windows containers. [GH-208]
+
 ## 1.1.2 (July 31, 2025)
 
 ### IMPROVEMENTS:
