@@ -51,8 +51,7 @@ jobs:
           go-version: ${{ needs.get-go-version.outputs.go-version }}
       - uses: golangci/golangci-lint-action@db582008a42febd596419635a5abc9d9815daa9c # v9.2.1
         with:
-          version: v2.12.2
-          only-new-issues: true
+          version: v2.10.1
   check-fmt:
     needs:
       - get-go-version
