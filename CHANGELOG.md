@@ -1,8 +1,28 @@
 ## Unreleased
 
-### FEATURES:
+### IMPROVEMENTS:
 
-* builder/docker: Add `windows_create_parent_dirs` option to automatically create destination parent directories on uploads to Windows containers. [GH-208]
+* Add `windows_create_parent_dirs` option to automatically create destination parent directories on uploads to Windows containers by @wbpascal in https://github.com/hashicorp/packer-plugin-docker/pull/230
+
+## 1.1.3 (June 9, 2026)
+
+### BUG FIXES:
+
+* Fix security vulnerabilities by updating transitive dependencies (including `ulikunitz`) by @sanyaraj2424 in https://github.com/hashicorp/packer-plugin-docker/pull/233
+* Fix authorization-related and dependency issues through module updates by @sanyaraj2424 in https://github.com/hashicorp/packer-plugin-docker/pull/228 and https://github.com/hashicorp/packer-plugin-docker/pull/229
+
+### IMPROVEMENTS:
+
+* Update `github.com/hashicorp/packer-plugin-sdk` dependency by @dependabot[bot] in https://github.com/hashicorp/packer-plugin-docker/pull/222 and https://github.com/hashicorp/packer-plugin-docker/pull/232
+* Improve CI linting reliability by upgrading `golangci-lint`, migrating lint configuration, and reporting only new issues by @sanyaraj2424.
+* Add automated backport workflow support by @devashish-patel in https://github.com/hashicorp/packer-plugin-docker/pull/221
+* Update Docker builder documentation by @aslindhurai-suntrion in https://github.com/hashicorp/packer-plugin-docker/pull/218
+* Update copyright and license headers for compliance by @hashicorp-copywrite[bot] in https://github.com/hashicorp/packer-plugin-docker/pull/223
+
+### Other Changes
+
+* Release preparation and version update changes for `1.1.3` by @sanyaraj2424
+* Dev version preparation by @anshulSharma in https://github.com/hashicorp/packer-plugin-docker/pull/217
 
 ## 1.1.2 (July 31, 2025)
 
