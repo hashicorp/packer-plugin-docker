@@ -37,11 +37,7 @@ func powerShellSingleQuote(s string) string {
 // Does not recreate paths that already exist.
 func (c *WindowsContainerCommunicator) ensureContainerParentDir(ctx context.Context, destination string) error {
 	cmd := &packersdk.RemoteCmd{
-		Command: strings.Join([]string{
-			fmt.Sprintf("Split-Path -Parent %s", powerShellSingleQuote(destination)),
-			"Where-Object { $_ -and -not (Test-Path -LiteralPath $_) }",
-			"ForEach-Object { New-Item -ItemType Directory -Force -Path $_ | Out-Null }",
-		}, " | "),
+		Command: fmt.Sprintf("$parent = Split-Path -Parent %s; if ($parent -and -not (Test-Path -LiteralPath $parent)) { New-Item -ItemType Directory -Force -LiteralPath $parent -ErrorAction Stop | Out-Null }", powerShellSingleQuote(destination)),
 	}
 	if err := c.Start(ctx, cmd); err != nil {
 		return err
@@ -88,8 +84,7 @@ func (c *WindowsContainerCommunicator) Upload(dst string, src io.Reader, fi *os.
 	// Copy the file into place by copying the temporary file we put
 	// into the shared folder into the proper location in the container
 	cmd := &packersdk.RemoteCmd{
-		Command: fmt.Sprintf("Copy-Item -Path %s/%s -Destination %s", c.ContainerDir,
-			filepath.Base(tempfile.Name()), dst),
+		Command: fmt.Sprintf("Copy-Item -LiteralPath %s -Destination %s -Force", powerShellSingleQuote(filepath.Join(c.ContainerDir, filepath.Base(tempfile.Name()))), powerShellSingleQuote(dst)),
 	}
 	if err := c.Start(ctx, cmd); err != nil {
 		return err
@@ -183,8 +178,7 @@ func (c *WindowsContainerCommunicator) UploadDir(dst string, src string, exclude
 
 	// Make the directory, then copy into it
 	cmd := &packersdk.RemoteCmd{
-		Command: fmt.Sprintf("Copy-Item %s -Destination %s -Recurse",
-			containerSrc, containerDst),
+		Command: fmt.Sprintf("Copy-Item -LiteralPath %s -Destination %s -Recurse", powerShellSingleQuote(containerSrc), powerShellSingleQuote(containerDst)),
 	}
 	if err := c.Start(ctx, cmd); err != nil {
 		return err
