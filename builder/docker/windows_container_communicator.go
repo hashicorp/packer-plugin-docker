@@ -12,6 +12,7 @@ import (
 	"log"
 	"os"
 	"path/filepath"
+	"strings"
 
 	packersdk "github.com/hashicorp/packer-plugin-sdk/packer"
 )
@@ -26,6 +27,28 @@ import (
 
 type WindowsContainerCommunicator struct {
 	Communicator
+}
+
+func powerShellSingleQuote(s string) string {
+	return "'" + strings.ReplaceAll(s, "'", "''") + "'"
+}
+
+// Creates the parent and all other preceding directories in the container for the given destination.
+// Does not recreate paths that already exist.
+func (c *WindowsContainerCommunicator) ensureContainerParentDir(ctx context.Context, destination string) error {
+	cmd := &packersdk.RemoteCmd{
+		Command: fmt.Sprintf("$parent = Split-Path -Parent %s; if ($parent -and -not (Test-Path -LiteralPath $parent)) { New-Item -ItemType Directory -Force -LiteralPath $parent -ErrorAction Stop | Out-Null }", powerShellSingleQuote(destination)),
+	}
+	if err := c.Start(ctx, cmd); err != nil {
+		return err
+	}
+
+	cmd.Wait()
+	if cmd.ExitStatus() != 0 {
+		return fmt.Errorf("Upload failed to create parent directory for %s: %d", destination, cmd.ExitStatus())
+	}
+
+	return nil
 }
 
 // Upload uses docker exec to copy the file from the host to the container
@@ -48,13 +71,21 @@ func (c *WindowsContainerCommunicator) Upload(dst string, src io.Reader, fi *os.
 	}
 	tempfile.Close()
 
+	// Before copying the file into place, we need to make sure that the parent folders
+	// exists if windows_create_parent_dirs was specified in the plugin config.
+	// See also https://github.com/hashicorp/packer-plugin-docker/issues/208
+	ctx := context.TODO()
+	if c.Config.WindowsCreateParentDirs {
+		if err := c.ensureContainerParentDir(ctx, dst); err != nil {
+			return err
+		}
+	}
+
 	// Copy the file into place by copying the temporary file we put
 	// into the shared folder into the proper location in the container
 	cmd := &packersdk.RemoteCmd{
-		Command: fmt.Sprintf("Copy-Item -Path %s/%s -Destination %s", c.ContainerDir,
-			filepath.Base(tempfile.Name()), dst),
+		Command: fmt.Sprintf("Copy-Item -LiteralPath %s -Destination %s -Force", powerShellSingleQuote(filepath.Join(c.ContainerDir, filepath.Base(tempfile.Name()))), powerShellSingleQuote(dst)),
 	}
-	ctx := context.TODO()
 	if err := c.Start(ctx, cmd); err != nil {
 		return err
 	}
@@ -135,12 +166,20 @@ func (c *WindowsContainerCommunicator) UploadDir(dst string, src string, exclude
 		containerDst = filepath.Join(dst, filepath.Base(src))
 	}
 
+	// Before copying the files into place, we need to make sure that the parent folders
+	// exists if windows_create_parent_dirs was specified in the plugin config.
+	// See also https://github.com/hashicorp/packer-plugin-docker/issues/208
+	ctx := context.TODO()
+	if c.Config.WindowsCreateParentDirs {
+		if err := c.ensureContainerParentDir(ctx, containerDst); err != nil {
+			return err
+		}
+	}
+
 	// Make the directory, then copy into it
 	cmd := &packersdk.RemoteCmd{
-		Command: fmt.Sprintf("Copy-Item %s -Destination %s -Recurse",
-			containerSrc, containerDst),
+		Command: fmt.Sprintf("Copy-Item -LiteralPath %s -Destination %s -Recurse", powerShellSingleQuote(containerSrc), powerShellSingleQuote(containerDst)),
 	}
-	ctx := context.TODO()
 	if err := c.Start(ctx, cmd); err != nil {
 		return err
 	}

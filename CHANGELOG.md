@@ -1,3 +1,9 @@
+## Unreleased
+
+### IMPROVEMENTS:
+
+* Add `windows_create_parent_dirs` option to automatically create destination parent directories on uploads to Windows containers by @wbpascal in https://github.com/hashicorp/packer-plugin-docker/pull/230
+
 ## 1.1.3 (June 9, 2026)
 
 ### BUG FIXES:

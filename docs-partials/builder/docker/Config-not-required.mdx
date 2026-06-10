@@ -98,6 +98,9 @@
   running on a windows host. This is necessary for building Windows
   containers, because our normal docker bindings do not work for them.
 
+- `windows_create_parent_dirs` (bool) - If true, creates parent directories for file and directory uploads to
+  Windows containers. This only applies when `windows_container` is true.
+
 - `platform` (string) - Set platform if server is multi-platform capable
 
 - `login` (bool) - This is used to login to a private docker repository (e.g., dockerhub)
