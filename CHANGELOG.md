@@ -1,3 +1,15 @@
+## 1.1.4 (July 14, 2026)
+
+### BUG FIXES:
+
+* Upgrade `golang.org/x/crypto` by @eshan-tripathi.
+
+### IMPROVEMENTS:
+
+* Update `github.com/hashicorp/packer-plugin-sdk` dependency by @dependabot[bot] in https://github.com/hashicorp/packer-plugin-docker/pull/238
+* Update `golangci-lint-action` version in CI workflow by @sanyaraj2424 in https://github.com/hashicorp/packer-plugin-docker/pull/237
+* Upgrade `.go-version` by @eshan-tripathi.
+
 ## 1.1.3 (June 9, 2026)
 
 ### BUG FIXES:
