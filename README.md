@@ -19,7 +19,7 @@ Then, run [`packer init`](https://www.packer.io/docs/commands/init).
 packer {
   required_plugins {
     docker = {
-      version = ">= 1.1.1"
+      version = ">= 1.1.5"
       source  = "github.com/hashicorp/docker"
     }
   }
