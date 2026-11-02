@@ -1,3 +1,16 @@
+## 1.1.5 (November 2, 2026)
+
+### IMPROVEMENTS:
+
+* Bump Go version to `1.26.10` and update dependencies by @hariom-hashicorp in https://github.com/hashicorp/packer-plugin-docker/pull/251
+* Update module dependencies (including `otel/sdk`) and regenerate HCL2 specs by @sanyaraj2424 in https://github.com/hashicorp/packer-plugin-docker/pull/248
+* Pin GitHub Actions workflow refs to latest SHAs by @eshan-tripathi in https://github.com/hashicorp/packer-plugin-docker/pull/246
+* Update copyright headers for compliance by @hashicorp-copywrite[bot] in https://github.com/hashicorp/packer-plugin-docker/pull/245
+
+### Other Changes
+
+* Dev version preparation for `1.1.5` by @eshan-tripathi in https://github.com/hashicorp/packer-plugin-docker/pull/244
+
 ## 1.1.4 (July 14, 2026)
 
 ### BUG FIXES:
