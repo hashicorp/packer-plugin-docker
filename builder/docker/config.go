@@ -131,9 +131,12 @@ type Config struct {
 	// A mapping of additional volumes to mount into this container. The key of
 	// the object is the host path, the value is the container path.
 	Volumes map[string]string `mapstructure:"volumes" required:"false"`
-	// If true, files uploaded to the container will be owned by the user the
-	// container is running as. If false, the owner will depend on the version
-	// of docker installed in the system. Defaults to true.
+	// If true, files uploaded to the container (for example shell provisioner
+	// scripts) will be owned by the user the container is running as. If false,
+	// uploaded files keep the ownership Docker assigns on copy (often root),
+	// which can cause "Permission denied" when the container USER is non-root.
+	// Defaults to true. Set explicitly to false only if you need Docker's
+	// default copy ownership behavior.
 	FixUploadOwner bool `mapstructure:"fix_upload_owner" required:"false"`
 	// If "true", tells Packer that you are building a Windows container
 	// running on a windows host. This is necessary for building Windows
@@ -165,8 +168,6 @@ type Config struct {
 
 func (c *Config) Prepare(raws ...interface{}) ([]string, error) {
 
-	c.FixUploadOwner = true
-
 	var md mapstructure.Metadata
 	err := config.Decode(c, &config.DecodeOpts{
 		Metadata:           &md,
@@ -181,6 +182,18 @@ func (c *Config) Prepare(raws ...interface{}) ([]string, error) {
 	}, raws...)
 	if err != nil {
 		return nil, err
+	}
+
+	// Default FixUploadOwner if it wasn't set (bool zero-value is false).
+	hasFixUploadOwner := false
+	for _, k := range md.Keys {
+		if k == "fix_upload_owner" {
+			hasFixUploadOwner = true
+			break
+		}
+	}
+	if !hasFixUploadOwner {
+		c.FixUploadOwner = true
 	}
 
 	// Defaults

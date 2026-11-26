@@ -90,9 +90,12 @@
 - `volumes` (map[string]string) - A mapping of additional volumes to mount into this container. The key of
   the object is the host path, the value is the container path.
 
-- `fix_upload_owner` (bool) - If true, files uploaded to the container will be owned by the user the
-  container is running as. If false, the owner will depend on the version
-  of docker installed in the system. Defaults to true.
+- `fix_upload_owner` (bool) - If true, files uploaded to the container (for example shell provisioner
+  scripts) will be owned by the user the container is running as. If false,
+  uploaded files keep the ownership Docker assigns on copy (often root),
+  which can cause "Permission denied" when the container USER is non-root.
+  Defaults to true. Set explicitly to false only if you need Docker's
+  default copy ownership behavior.
 
 - `windows_container` (bool) - If "true", tells Packer that you are building a Windows container
   running on a windows host. This is necessary for building Windows
